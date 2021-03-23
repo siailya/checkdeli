@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill-rule: evenodd;
+        filter: url(#filter);
+      }
+    </style>
+    <filter id="filter" x="44.219" y="32.063" width="99.219" height="128.938" filterUnits="userSpaceOnUse">
+      <feImage preserveAspectRatio="none" x="44.2188" y="32.0625" width="99.219" height="128.938" result="image" xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iOTkuMjE5IiBoZWlnaHQ9IjEyOC45MzgiIHZpZXdCb3g9IjAgMCA5OS4yMTkgMTI4LjkzOCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogdXJsKCNsaW5lYXItZ3JhZGllbnQpOwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJsaW5lYXItZ3JhZGllbnQiIHkxPSIzOS4xOTEiIHgyPSI5OS4yMTkiIHkyPSI4OS43NDYiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwLjMwNSIgc3RvcC1jb2xvcj0iIzljMDBmZiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjAuMzA4IiBzdG9wLWNvbG9yPSIjOWIwMWZmIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMC42OTUiIHN0b3AtY29sb3I9IiMwMDg0ZmYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IGNsYXNzPSJjbHMtMSIgd2lkdGg9Ijk5LjIxOSIgaGVpZ2h0PSIxMjguOTM4Ii8+Cjwvc3ZnPgo="/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="icon">
+    <rect id="Прямоугольник_скругл._углы_1" data-name="Прямоугольник, скругл. углы 1" class="cls-1" x="1" y="1" width="199" height="199" rx="25" ry="25"/>
+    <path id="Ч" class="cls-2" d="M121.1,32.049V92.191a120.2,120.2,0,0,1-29.938,3.72q-13.375,0-18.955-5.226T66.541,73.147v-41.1H44.22V73.014q0.087,20.573,11.958,30.769t34.987,10.2a121.526,121.526,0,0,0,29.938-3.632v50.665h22.321V32.049H121.1Z"/>
+  </g>
+</svg>

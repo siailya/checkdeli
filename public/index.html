@@ -1,17 +1,65 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="ru" theme="dark">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no">
+      <meta name="msapplication-TileColor" content="#FF00EA">
+      <meta name="theme-color" content="#FF00EA">
+    <link rel="icon" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(74182951, "init", {
+          clickmap:true,
+          trackLinks:true,
+          accurateTrackBounce:true,
+          webvisor:true
+      });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/74182951" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <title>Чекдели</title>
+    <style>
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s ease
+        }
+        .fade-enter, .fade-leave-active {
+            opacity: 0;
+        }
+        .child-view {
+            position: absolute;
+            transition: all .75s cubic-bezier(.55,0,.1,1);
+        }
+        .slide-left-enter, .slide-right-leave-active {
+            transition: all .5s ease-in-out;
+            opacity: 0;
+            -webkit-transform: translate(100px, 0);
+            transform: translate(100px, 0);
+        }
+        .slide-left-leave-active, .slide-right-enter {
+            transition: all .5s ease-in-out;
+            opacity: 0;
+            -webkit-transform: translate(-100px, 0);
+            transform: translate(-100px, 0);
+        }
+    </style>
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>Чекдели не умеет работать без JavaScript. Включай быстрее и давай делить чеки!</strong>
     </noscript>
+    <div class="background"></div>
+    <script src="/__/firebase/8.2.10/firebase-app.js"></script>
+    <script src="/__/firebase/8.2.10/firebase-analytics.js"></script>
+    <script src="/__/firebase/init.js"></script>
+<!--    <script defer src="/__/firebase/init.js?useEmulator=true"></script>-->
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+<!--    <script>eruda.init();</script>-->
     <div id="app"></div>
-    <!-- built files will be auto injected -->
   </body>
 </html>
