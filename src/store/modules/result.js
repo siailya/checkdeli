@@ -3,7 +3,6 @@ export default {
         payers: [],
         who_whom: {},
         whom_who: {},
-        hashed_result: ""
     },
     actions: {
     },

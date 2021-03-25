@@ -1,6 +1,46 @@
 <template>
   <div id="app">
     <div class="page">
+      <b-modal no-close-on-backdrop no-close-on-esc id="cookies_accept" content-class="cd-card" centered hide-footer hide-header>
+        <div class="header text-center color-text">
+          Осторожно! Мы используем куки!
+        </div>
+        <div class="cookies-text mt-3">
+          На самом деле, ничего страшного в этом нет.
+          Без кук все работало бы через жопу, а мы не смогли бы получать статистику.
+        </div>
+        <div class="accept-pls text-center color-text mt-1">
+          Прими соглашение и мы больше не вернемся к этому вопросу!
+        </div>
+        <div class="text-center mt-2">
+          <button class="show-full" v-b-modal.full_policy_text>То же самое, но с терминами</button>
+        </div>
+        <div class="accept text-center mt-3">
+          <button class="accept-btn color-text active-btn" @click="acceptCookies">
+            Принять и продолжить
+          </button>
+        </div>
+      </b-modal>
+      <b-modal id="full_policy_text" hide-header hide-footer content-class="cd-card" centered>
+        <div class="full-policy-text">
+          <div class="close" @click="$bvModal.hide('full_policy_text')">
+            <i class="material-icons">close</i>
+          </div>
+          Сайт «Чекдели», расположенный в сети Интернет по адресу checkdeli.online использует сервис веб-аналитики Яндекс.Метрика, предоставляемый компанией ООО «ЯНДЕКС», 119021, Россия, Москва, ул. Л. Толстого, 16 (далее — Яндекс).
+          <br>
+          <br>
+          Сервис Яндекс.Метрика использует технологию «cookie» — небольшие текстовые файлы, размещаемые на компьютере пользователей с целью анализа их пользовательской активности.
+          <br>
+          <br>
+          Собранная при помощи cookie информация не может идентифицировать вас, однако может помочь нам улучшить работу нашего сайта. Информация об использовании вами данного сайта, собранная при помощи cookie, будет передаваться Яндексу и храниться на сервере Яндекса в ЕС и Российской Федерации. Яндекс будет обрабатывать эту информацию для оценки использования вами сайта, составления для нас отчетов о деятельности нашего сайта, и предоставления других услуг. Яндекс обрабатывает эту информацию в порядке, установленном в условиях использования сервиса Яндекс.Метрика.
+          <br>
+          <br>
+          Вы можете отказаться от использования cookies, выбрав соответствующие настройки в браузере. Также вы можете использовать инструмент — https://yandex.ru/support/metrika/general/opt-out.html. Однако это может повлиять на работу некоторых функций сайта. Используя этот сайт, вы соглашаетесь на обработку данных о вас Яндексом в порядке и целях, указанных выше.
+          <br>
+          <br>
+          Так же сайт использует технологию «LocalStorage», позволяющую хранить пользовательские данные на устройстве между сессиями. Для продолжения работы вы так же соглашаетесь с тем фактом, что некоторые введенные вами данные будут храниться между сессиями.
+        </div>
+      </b-modal>
       <transition name="fade" mode="out-in" appear>
         <router-view/>
       </transition>
@@ -16,17 +56,27 @@ export default {
       transitionName: "fade"
     }
   },
+  methods: {
+    acceptCookies() {
+      window.localStorage.setItem("cookies", "true")
+      this.$bvModal.hide("cookies_accept")
+    }
+  },
   watch: {
     $route(to, from) {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
-      console.log(toDepth, fromDepth)
       this.transitionName = toDepth < fromDepth ? 'slide-right' : toDepth === fromDepth ? 'fade' : 'slide-right'
     }
   },
   created() {
     if (window.localStorage.getItem("onboarding") !== "true") {
       this.$router.push("/intro")
+    }
+  },
+  mounted() {
+    if (window.localStorage.getItem("cookies") !== "true") {
+      this.$bvModal.show("cookies_accept")
     }
   }
 }
@@ -42,6 +92,8 @@ body, html{
 
 body{
   background-color: rgba(255, 255, 255, 0)!important;
+  user-select: none;
+  overflow-x: hidden;
 }
 
 html[theme="glass"]{
@@ -252,36 +304,37 @@ html[theme="dark"] .active-btn:active{
   margin-top: -4px;
 }
 
+
 @media screen and (min-width: 768px){
-  .page,{
+  .page, .adaptive-width{
     width: 80%;
     margin-left: 10%;
   }
 }
 
 @media screen and (min-width: 1000px){
-  .page{
+  .page, .adaptive-width{
     width: 70%;
     margin-left: 15%;
   }
 }
 
 @media screen and (min-width: 1200px){
-  .page{
+  .page, .adaptive-width{
     width: 60%;
     margin-left: 20%;
   }
 }
 
 @media screen and (min-width: 1400px){
-  .page{
+  .page, .adaptive-width{
     width: 50%;
     margin-left: 25%;
   }
 }
 
 @media screen and (min-width: 1600px){
-  .page{
+  .page, .adaptive-width{
     width: 40%;
     margin-left: 30%;
   }
@@ -324,5 +377,45 @@ html[theme="light"] .cd-card.modal-content {
 }
 .slide-right-leave-active {
   position: absolute;
+}
+</style>
+
+<style scoped lang="scss">
+.header{
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.cookies-text{
+  color: var(--text-color);
+}
+
+.show-full{
+  color: var(--main);
+  text-decoration: underline;
+  border: none;
+  background: none;
+}
+
+html[theme="glass"]{
+  .accept-pls, .show-full, .header{
+    color: white;
+  }
+}
+
+.accept-btn{
+  border: none;
+  outline: none;
+  border-radius: 30px;
+  padding: 8px 12px;
+  background: var(--btn-background);
+  font-size: 18px;
+}
+
+.full-policy-text{
+  color: var(--text-color);
+  i{
+    color: var(--text-color);
+  }
 }
 </style>

@@ -95,14 +95,15 @@ export default {
       }
     },
     mainColor() {
-      return window.getComputedStyle(document.documentElement).getPropertyValue('--main').substr(2)
+      return window.getComputedStyle(document.documentElement).getPropertyValue('--main').replace("#", "").replace(" ", "")
     },
     dragOptions() {
       return {
         animation: 200,
         group: "description",
         disabled: false,
-        ghostClass: "ghost"
+        ghostClass: "ghost",
+        wrong_timer: false
       };
     }
   },
@@ -119,8 +120,7 @@ export default {
       }
 
     },
-    deleteUserComplete(index) {
-      console.log(index)
+    deleteUserComplete() {
       if (this.users.length > 0) {
         let new_height = this.users.length * 74 + 10
         let el = document.getElementsByClassName("users-wrapper")[0]
@@ -131,7 +131,8 @@ export default {
       }
     },
     validateNext() {
-      function showWrong (text) {
+      const showWrong = (text) => {
+        clearTimeout(this.wrong_timer)
         let el = document.getElementById("next-btn")
         el.style.animation = "wrong .3s infinity"
         el.classList.add("next-btn-wrong")
@@ -140,11 +141,11 @@ export default {
         el.children[0].innerHTML = text
         el.children[0].style.fontWeight = "400"
         // el.children[0].style.fontSize = "16px"
-        setTimeout(() => {
+        this.wrong_timer = setTimeout(() => {
           // el.children[0].style.fontSize = "18px"
           el.classList.remove("next-btn-wrong")
           el.style.animation = ""
-          el.style.backgroundColor = "white"
+          el.style.backgroundColor = "var(--btn-background)"
           el.children[0].classList.add("color-text")
           el.children[0].style.fontWeight = "500"
           el.children[0].innerHTML = "Дальше!"
@@ -153,16 +154,15 @@ export default {
 
       if (this.users.length < 2) {
         if (this.users.length === 1) {
-          showWrong("Добавим еще кого-нибудь?")
+          showWrong("Добавь еще кого-нибудь!")
         } else {
-          showWrong("Тут никого нет!")
+          showWrong("Но тут же никого нет!")
         }
       }
       else if (this.users.filter((el) => {return el.name.trim() === ''}).length !== 0) {
         showWrong("Стоит всем дать имена!")
       } else {
         this.$router.push("/calculating")
-        console.log(this.users[0].id)
         this.setDefaultPayed(this.users[0].id)
       }
     }

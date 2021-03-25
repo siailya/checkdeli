@@ -21,7 +21,7 @@ const routes = [
         component: () => import("../views/Calculating")
     },
     {
-        path: "/results",
+        path: "/results/:storestring?",
         name: "Results",
         component: () => import("../views/Results")
     },

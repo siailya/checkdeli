@@ -66,7 +66,7 @@
             <transition name="fade">
               <div class="other-content" :id="'other_content_' + index" v-if="openedCells.indexOf(index) !== -1">
                 <div class="delete-product mb-2 d-flex">
-                  <button class="payed-product-btn w-100 mr-1 shadowed" v-b-modal.change_payed
+                  <button class="payed-product-btn w-100 shadowed" v-b-modal.change_payed
                           @click="selectedProduct = product">
                     <span class="color-text d-flex justify-content-center align-items-center">
                       <i class="material-icons mr-1">account_balance_wallet</i>
@@ -77,7 +77,12 @@
                       }}
                     </span>
                   </button>
-                  <button class="delete-product-btn w-50 ml-1 shadowed" @click="() => deleteProductItem(index)">
+                  <button class="copy-product-btn w-25 mr-1 ml-1 shadowed" @click="copyProduct(index)">
+                    <span class="color-text d-flex justify-content-center align-items-center">
+                      <i class="material-icons">content_copy</i>
+                    </span>
+                  </button>
+                  <button class="delete-product-btn w-50 shadowed" @click="() => deleteProductItem(index)">
                     <span class="d-flex justify-content-center align-items-center">
                       <i class="material-icons mr-1">delete_outline</i>
                       Удалить
@@ -132,7 +137,7 @@
       </div>
     </div>
     <transition name="slide-up" appear>
-      <div class="snackbar cd-card text-center text-white" id="snackbar" v-if="snackbar_show" @click="snackbarClose">
+      <div class="adaptive-width snackbar cd-card text-center text-white" id="snackbar" v-if="snackbar_show" @click="snackbarClose">
         <transition name="fade">
           <span>
             {{snackbar_text}}
@@ -158,7 +163,8 @@ export default {
       openedCells: [],
       selectedProduct: {},
       snackbar_show: false,
-      snackbar_text: ""
+      snackbar_text: "",
+      tooltips: {add_prd: true, expand: false, check_user: false, change_payer: false}
     }
   },
   computed: {
@@ -172,28 +178,33 @@ export default {
       }
     },
     mainColor() {
-      return window.getComputedStyle(document.documentElement).getPropertyValue('--main').substr(2)
+      return window.getComputedStyle(document.documentElement).getPropertyValue('--main').replace("#", "").replace(" ", "")
     },
     dragOptions() {
       return {
         animation: 200,
         group: "description",
         disabled: false,
-        ghostClass: "ghost"
+        ghostClass: "ghost",
+        wrong_timer: false
       };
     }
   },
   methods: {
     ...mapActions(["addProduct", "deleteProduct", "addUserToProduct", "setProductPayed"]),
     toggleOtherContent(index) {
-      let itemIndex = this.openedCells.indexOf(index)
-      if (itemIndex === -1) {
-        this.openedCells.push(index)
+      if (this.users.length > 0) {
+        let itemIndex = this.openedCells.indexOf(index)
+        if (itemIndex === -1) {
+          this.openedCells.push(index)
+        } else {
+          this.openedCells.splice(itemIndex, 1)
+          document.getElementById(`other_content_${index}`).style.height = "0px"
+          document.getElementById(`other_content_${index}`).style.padding = "0px"
+          document.getElementById(`other_content_${index}`).style.margin = "0px"
+        }
       } else {
-        this.openedCells.splice(itemIndex, 1)
-        document.getElementById(`other_content_${index}`).style.height = "0px"
-        document.getElementById(`other_content_${index}`).style.padding = "0px"
-        document.getElementById(`other_content_${index}`).style.margin = "0px"
+        this.setSnackbar("Кажется, нет пользователей... Вернись обратно и заполни пользователей")
       }
     },
     toggleProductUser(index, user_id) {
@@ -207,8 +218,14 @@ export default {
         this.products[index].cost = 1
       }
     },
+    copyProduct(index) {
+      let to_copy = JSON.parse(JSON.stringify(this.products[index]))
+      to_copy.id = Math.ceil(Math.random() * 1000)
+      this.$store.commit("addProduct", to_copy)
+    },
     validateNext() {
-      function showWrong(text) {
+      const showWrong = (text) => {
+        clearTimeout(this.wrong_timer)
         let el = document.getElementById("next-btn")
         el.style.animation = "wrong .3s infinity"
         el.classList.add("next-btn-wrong")
@@ -217,27 +234,34 @@ export default {
         el.children[0].innerHTML = text
         el.children[0].style.fontWeight = "400"
         // el.children[0].style.fontSize = "16px"
-        setTimeout(() => {
+        this.wrong_timer = setTimeout(() => {
           // el.children[0].style.fontSize = "18px"
           el.classList.remove("next-btn-wrong")
           el.style.animation = ""
-          el.children[0].style.fontWeight = "500"
           el.style.backgroundColor = "var(--btn-background)"
           el.children[0].classList.add("color-text")
-          el.children[0].innerHTML = "Дальше!"
+          el.children[0].style.fontWeight = "500"
+          el.children[0].innerHTML = "К результатам!"
         }, 2500)
       }
 
-      let oc = JSON.parse(JSON.stringify(this.openedCells))
-      for (let i in oc) {
-        this.toggleOtherContent(oc[i])
-      }
+      this.products.forEach((item, index) => {
+        if (item.users.length === 0) {
+          if (this.openedCells.indexOf(index) === -1) {
+            this.toggleOtherContent(index)
+          }
+        } else {
+          if (this.openedCells.indexOf(index) !== -1) {
+            this.toggleOtherContent(index)
+          }
+        }
+      })
 
       if (this.products.length < 2) {
         if (this.products.length === 1) {
-          showWrong("Калькулятор не под рукой?")
+          showWrong("Добавь хотя бы 2 позиции!")
         } else {
-          showWrong("Туса без всего - лучшая туса!")
+          showWrong("Добавь что-нибудь!")
         }
       } else if (this.products.filter((el) => {
         return el.title.trim() === ''
@@ -255,8 +279,7 @@ export default {
         })[0].id][0].focus()
         showWrong("Бесплатно??")
       } else if (this.products.map((item) => {return item.users.length}).some((item) => {return item === 0})) {
-        this.toggleOtherContent(this.products.map((item) => {return item.users.length}).indexOf(0))
-        showWrong("Отдай нетронутое мне!")
+        showWrong("Отметь пользователей во всех продуктах!")
       } else{
         this.calculateResults()
         this.$router.push("/results")
@@ -330,8 +353,6 @@ export default {
         let one_pay = parseFloat((product.cost / product.users.length).toFixed(2))
         this.users.forEach((user) => {
           if (product.users.indexOf(user.id) !== -1) {
-            console.log(product)
-            console.log(user.products)
             if(user.products.find((prd) => {return prd.product.id === product.id}) === undefined){
               user.products.push({product: product, amount: one_pay})
             }
@@ -363,13 +384,21 @@ export default {
 
       console.log('Все раскидано примерно за', performance.now() - time, 'мс')
 
-      console.log(JSON.stringify(this.users[0]))
-
       this.$store.commit("updatePayers", payers)
       this.$store.commit("updateWhomWho", whom_who)
       this.$store.commit("updateWhoWhom", who_whom)
     }
   },
+  beforeMount() {
+    if (this.users.length === 0) {
+      this.$router.push("/addusers")
+    }
+  },
+  mounted() {
+    window.onbeforeunload = () => {
+      return  "Стой! Введенные данные не сохранятся при перезагрузке!"
+    }
+  }
 }
 </script>
 
@@ -379,11 +408,16 @@ export default {
 
 .snackbar {
   position: fixed;
-  width: 90%;
-  margin-left: 5%;
+  margin-left: 0!important;
   bottom: 2vh;
-  margin-right: 0;
   border-radius: 15px;
+}
+
+@media screen and (max-width: 768px){
+  .snackbar {
+    width: 90%!important;
+    margin-left: 5%!important;
+  }
 }
 
 html[theme="glass"]{
@@ -486,7 +520,6 @@ html[theme="light"] {
 
 .product-cell {
   transition: all .3s;
-  cursor: move;
   padding: 8px;
   overflow: hidden;
   border-radius: 10px;
@@ -495,6 +528,9 @@ html[theme="light"] {
     margin-top: auto;
     margin-bottom: auto;
     outline: none;
+  }
+  div {
+    cursor: pointer;
   }
 }
 
@@ -532,7 +568,7 @@ html[theme="dark"] .other-content {
   background: var(--background-light);
 }
 
-.delete-product-btn, .payed-product-btn {
+.delete-product-btn, .payed-product-btn, .copy-product-btn {
   background-color: var(--wrong);
   color: white;
   border: none;
@@ -554,7 +590,7 @@ html[theme="dark"] .other-content {
 }
 
 html[theme="dark"] {
-  .payed-product-btn{
+  .payed-product-btn, .copy-product-btn{
     background: var(--background-light);
   }
 }

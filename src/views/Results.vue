@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div class="cd-card results-wrapper">
+    <div class="cd-card results-wrapper mb-3">
       <div class="mode-buttons d-flex justify-content-around">
         <div class="slider" id="slider"></div>
         <div class="who-whom w-100">
@@ -76,22 +76,50 @@
         </div>
       </transition-group>
     </div>
+    <div class="fromurl-edit cd-card" v-show="fromURL">
+      <button class="edit-url-btn d-flex w-100 justify-content-center" @click="$router.push('/addusers')">
+        <i class="material-icons mr-1">edit</i>
+        Редактировать
+        <span class="beta">BETA</span>
+      </button>
+    </div>
+    <div class="cd-card share mt-3 mb-4">
+      <div class="text-center share-header color-text">
+        Поделись ссылкой
+      </div>
+      <div class="text-center share-subheader">
+        Друзья смогут посмотреть результаты и сказать тебе, если что-то не так
+      </div>
+      <div class="share-link d-flex mt-2">
+        <input class="input form-control w-100" readonly :value="shareLink"/>
+        <button class="copy-link ml-2 shadowed active-btn" @click="copyLink">
+          <i class="material-icons mt-auto mb-auto">content_copy</i>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
+import utf8 from "base-64";
+import base64 from "base-64";
 
 export default {
   name: "Results",
   data() {
     return {
       mode: 0,
-      activeUser: {products: []}
+      activeUser: {products: []},
+      fromURL: false
     }
   },
   computed: {
-    ...mapGetters(["users", "payers", "who_whom", "whom_who", "userById", "productById"])
+    ...mapGetters(["users", "payers", "who_whom", "whom_who", "userById", "productById"]),
+    shareLink() {
+      let tokenized = base64.encode(utf8.encode(JSON.stringify(this.$store.state)))
+      return "https://checkdeli.online/results/" + tokenized
+    }
   },
   methods: {
     toggleMode(mode) {
@@ -121,6 +149,18 @@ export default {
     showUserMore(user) {
       this.activeUser = user
       this.$bvModal.show("user_modal")
+    },
+    copyLink() {
+      navigator.clipboard.writeText("Разделенный чек можно посмотреть тут: \n\n" + this.shareLink)
+    }
+  },
+  created() {
+    if (this.$route.params.storestring) {
+      let storestate = JSON.parse(utf8.decode(base64.decode(this.$route.params.storestring)))
+      this.$store.state.users = storestate.users
+      this.$store.state.products = storestate.products
+      this.$store.state.result = storestate.result
+      this.fromURL = true
     }
   }
 }
@@ -163,7 +203,6 @@ html[theme="dark"] {
 .results-wrapper{
   border-radius: 0 0 15px 15px!important;
   min-height: 80vh;
-  margin-bottom: 5vh;
 }
 
 .mode-buttons{
@@ -262,6 +301,51 @@ html[theme="dark"] {
   .payed-by{
     font-weight: 400;
     font-size: 0.7em;
+  }
+}
+
+.edit-url-btn{
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  background: var(--btn-background);
+  padding: 6px 12px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--main);
+  .beta{
+    margin-left: 2px;
+    font-size: 0.65em;
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+  i{
+    font-size: 20px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+}
+
+html[theme="glass"] .share{
+  background: rgba(255, 255, 255, 0.7)!important;
+}
+.share-header{
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.share-subheader{
+  color: var(--text-color);
+}
+
+.copy-link{
+  border-radius: 30px;
+  background: var(--btn-background);
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  i{
+    color: var(--main);
   }
 }
 </style>

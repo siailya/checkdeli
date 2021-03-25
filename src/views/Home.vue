@@ -48,7 +48,7 @@
     </div>
     <div class="fixed-bottom">
       <a href="https://vk.com/overcreated" class="madeby align-items-center">Сделано {{["overcreated", "siailya"][Math.floor(Math.random() * 2)]}} c <i class="material-icons" style="color: var(--wrong); font-size: 15px">favorite</i></a>
-      <div class="ver">v1.0.2b</div>
+      <div class="ver">v1.0.3b</div>
     </div>
   </div>
 </template>
