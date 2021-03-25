@@ -102,8 +102,8 @@
 
 <script>
 import {mapGetters} from "vuex";
-import utf8 from "utf8";
-import base64 from "base-64";
+import {Base64} from 'js-base64';
+Base64.extendString();
 
 export default {
   name: "Results",
@@ -117,7 +117,8 @@ export default {
   computed: {
     ...mapGetters(["users", "payers", "who_whom", "whom_who", "userById", "productById"]),
     shareLink() {
-      let tokenized = base64.encode(utf8.encode(JSON.stringify(this.$store.state)))
+      let tokenized = JSON.stringify(this.$store.state).toBase64URL()
+      console.log("Share link decoded:", tokenized)
       return "https://checkdeli.online/results/" + tokenized
     }
   },
@@ -154,9 +155,14 @@ export default {
       navigator.clipboard.writeText("Разделенный чек можно посмотреть тут: \n\n" + this.shareLink)
     }
   },
-  created() {
+  beforeCreate() {
+    console.log(this.$route.params)
+  },
+  mounted() {
     if (this.$route.params.storestring) {
-      let storestate = JSON.parse(utf8.decode(base64.decode(this.$route.params.storestring)))
+      console.log("Trying to decode from url, decoded:", this.$route.params.storestring)
+      let storestate = JSON.parse(this.$route.params.storestring.fromBase64())
+      console.log("Encoded:", storestate)
       this.$store.state.users = storestate.users
       this.$store.state.products = storestate.products
       this.$store.state.result = storestate.result
