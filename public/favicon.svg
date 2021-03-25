@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #333;
+      }
+
+      .cls-2 {
+        fill: #ffdb58;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <g id="favicon_dark">
+    <rect id="Прямоугольник_скругл._углы_1" data-name="Прямоугольник, скругл. углы 1" class="cls-1" x="1" y="1" width="119" height="119" rx="10" ry="10"/>
+    <path id="Ч" class="cls-2" d="M73.949,266.816v31.165a62.247,62.247,0,0,1-15.514,1.928q-6.931,0-9.822-2.708t-2.937-9.088v-21.3H34.109v21.228q0.045,10.661,6.2,15.944t18.13,5.284a62.976,62.976,0,0,0,15.514-1.881v26.253H85.515V266.816H73.949Z" transform="translate(0 -240)"/>
+  </g>
+</svg>
