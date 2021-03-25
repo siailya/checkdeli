@@ -102,7 +102,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-import utf8 from "base-64";
+import utf8 from "utf8";
 import base64 from "base-64";
 
 export default {
