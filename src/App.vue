@@ -1,16 +1,13 @@
 <template>
   <div id="app">
     <div class="page">
-      <b-modal no-close-on-backdrop no-close-on-esc id="cookies_accept" content-class="cd-card" centered hide-footer hide-header>
+      <transition name="slide-right">
+        <div id="cookies_accept" class="cd-card adaptive-width" v-if="cookies !== 'true'">
         <div class="header text-center color-text">
-          Осторожно! Мы используем куки!
+          Мы используем куки!
         </div>
-        <div class="cookies-text mt-3">
-          На самом деле, ничего страшного в этом нет.
+        <div class="text-center cookies-text mt-3">
           Без кук все работало бы через жопу, а мы не смогли бы получать статистику.
-        </div>
-        <div class="accept-pls text-center color-text mt-1">
-          Прими соглашение и мы больше не вернемся к этому вопросу!
         </div>
         <div class="text-center mt-2">
           <button class="show-full" v-b-modal.full_policy_text>То же самое, но с терминами</button>
@@ -20,7 +17,9 @@
             Принять и продолжить
           </button>
         </div>
-      </b-modal>
+      </div>
+      </transition>
+
       <b-modal id="full_policy_text" hide-header hide-footer content-class="cd-card" centered>
         <div class="full-policy-text">
           <div class="close" @click="$bvModal.hide('full_policy_text')">
@@ -53,13 +52,14 @@ export default {
   name: "App",
   data () {
     return {
-      transitionName: "fade"
+      transitionName: "fade",
+      cookies: window.localStorage.getItem("cookies")
     }
   },
   methods: {
     acceptCookies() {
       window.localStorage.setItem("cookies", "true")
-      this.$bvModal.hide("cookies_accept")
+      this.cookies = "true"
     }
   },
   watch: {
@@ -67,16 +67,6 @@ export default {
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : toDepth === fromDepth ? 'fade' : 'slide-right'
-    }
-  },
-  created() {
-    if (window.localStorage.getItem("onboarding") !== "true") {
-      this.$router.push("/intro")
-    }
-  },
-  mounted() {
-    if (window.localStorage.getItem("cookies") !== "true") {
-      this.$bvModal.show("cookies_accept")
     }
   }
 }
@@ -381,6 +371,15 @@ html[theme="light"] .cd-card.modal-content {
 </style>
 
 <style scoped lang="scss">
+#cookies_accept{
+  position: fixed;
+  bottom: 10px;
+  z-index: 1031;
+  width: 90%;
+  left: 5%;
+  margin-left: 0;
+}
+
 .header{
   font-size: 1.2em;
   font-weight: 500;

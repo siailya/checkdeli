@@ -1,9 +1,9 @@
 <template>
   <div class="intro">
-    <div class="intro-slider">
+    <div class="intro-slider mt-4">
       <transition name="slide-right" appear>
         <div key="12312" class="intro-slide text-center" v-if="activeSlide === 0">
-          <div class="slide-header">
+          <div class="slide-header color-text">
             {{slides[activeSlide][0]}}
           </div>
           <div class="slide-subheader">
@@ -19,7 +19,7 @@
           </div>
         </div>
         <div key="2344432" class="intro-slide text-center" v-if="activeSlide === 1">
-          <div class="slide-header">
+          <div class="slide-header color-text">
             {{slides[activeSlide][0]}}
           </div>
           <div class="slide-subheader">
@@ -35,7 +35,7 @@
           </div>
         </div>
         <div key="435434" class="intro-slide text-center" v-if="activeSlide === 2">
-          <div class="slide-header">
+          <div class="slide-header color-text">
             {{slides[activeSlide][0]}}
           </div>
           <div class="slide-subheader">
@@ -103,6 +103,10 @@ export default {
   padding: 10px 16px;
 }
 
+.intro-slide{
+  padding-bottom: 10vh;
+}
+
 .slide-header{
   color: var(--main);
   font-size: 28px;
@@ -142,6 +146,11 @@ export default {
 }
 
 .next-slide{
+  position: fixed;
+  bottom: 2vh;
+  margin-left: 0;
+  width: 90%;
+  left: 5%;
   button{
     border-radius: 20px;
     border: none;

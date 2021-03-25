@@ -307,7 +307,7 @@ html[theme="dark"] {
   border: 2.5px dashed rgba( 255, 255, 255, 0.18 );
   padding: 15px;
   margin: 0 5px;
-  position: absolute;
+  position: fixed;
   bottom: 5vh;
   height: 100px;
   width: 90%;
@@ -315,7 +315,7 @@ html[theme="dark"] {
   box-shadow: 0 -200px 0 900px rgb(0 0 0 / 50%);
   @media screen and (min-width: 768px){
     width: 60%;
-    margin-left: 20%;
+    left: 20%;
   }
 }
 
