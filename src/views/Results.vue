@@ -84,8 +84,11 @@
       </button>
     </div>
     <div class="cd-card share mt-3 mb-4">
-      <div class="text-center share-header color-text">
-        Поделись ссылкой
+      <div class="text-center share-header color-text d-flex justify-content-center">
+        <div class="text-center">
+          Поделись ссылкой
+        </div>
+        <span class="beta">BETA</span>
       </div>
       <div class="text-center share-subheader">
         Друзья смогут посмотреть результаты и сказать тебе, если что-то не так
@@ -96,6 +99,7 @@
           <i class="material-icons mt-auto mb-auto">content_copy</i>
         </button>
       </div>
+      <div class="notice mt-2">Длинные ссылки могут не открыться в некоторых браузерах, а так же не отправиться в мессенджерах</div>
     </div>
   </div>
 </template>
@@ -118,6 +122,7 @@ export default {
     ...mapGetters(["users", "payers", "who_whom", "whom_who", "userById", "productById"]),
     shareLink() {
       let tokenized = JSON.stringify(this.$store.state).toBase64URL()
+      // console.log(JSON.stringify(this.$store.state))
       console.log("Share link decoded:", tokenized)
       return "https://checkdeli.online/results/" + tokenized
     }
@@ -161,6 +166,7 @@ export default {
   mounted() {
     if (this.$route.params.storestring) {
       console.log("Trying to decode from url, decoded:", this.$route.params.storestring)
+      // let storestate = JSON.parse(this.$route.params.storestring)
       let storestate = JSON.parse(this.$route.params.storestring.fromBase64())
       console.log("Encoded:", storestate)
       this.$store.state.users = storestate.users
@@ -319,17 +325,19 @@ html[theme="dark"] {
   font-size: 18px;
   font-weight: 500;
   color: var(--main);
-  .beta{
-    margin-left: 2px;
-    font-size: 0.65em;
-    font-weight: 400;
-    color: var(--text-secondary);
-  }
   i{
     font-size: 20px;
     margin-top: auto;
     margin-bottom: auto;
   }
+}
+
+.beta{
+  margin-left: 2px;
+  font-size: 0.65em;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: auto;
 }
 
 html[theme="glass"] .share{
@@ -353,6 +361,12 @@ html[theme="glass"] .share{
   i{
     color: var(--main);
   }
+}
+
+.notice{
+  font-size: 0.7em;
+  text-align: center;
+  color: var(--text-secondary);
 }
 </style>
 
