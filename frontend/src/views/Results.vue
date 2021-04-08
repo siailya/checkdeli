@@ -1,15 +1,15 @@
 <template>
-  <div class="results">
+  <div class="results page">
     <b-modal id="user_modal" content-class="cd-card" centered hide-header hide-footer>
       <div class="header text-center">Подробности о пользователе {{activeUser.name}}</div>
       <div class="subheader text-center font-weight-light">
         Внутренние операции пользователя
       </div>
       <div class="user-modal-products">
-        <div class="modal-product d-flex justify-content-between mb-1 mt-1 p-1" style="border-bottom: #696969 1px solid" v-for="product in activeUser.products" :key="product.product.id">
+        <div class="modal-product d-flex justify-content-between mb-1 mt-1 p-1" style="border-bottom: #696969 1px solid" v-for="product in activeUser.products" :key="product.product_id">
           <div class="main-info">
-            {{product.product.title}}
-            <div class="payed-by">Оплатил(а) {{users.find(user => {return user.id === product.product.payed}).name}}</div>
+            {{productById(product.product_id).title}}
+            <div class="payed-by">Оплатил(а) {{users.find(user => {return user.id === productById(product.product_id).payed}).name}}</div>
           </div>
           <div class="amount-info mt-auto mb-auto">
             {{product.amount}} ₽
@@ -20,7 +20,7 @@
             Всего
           </div>
           <div class="amount-info mt-auto mb-auto" style="font-size: 1.3em">
-            {{activeUser.products.map(product => {return product.amount}).reduce((a, b) => a + b, 0).toFixed(2)}}
+            {{activeUser.products.map(product => {return product.amount}).reduce((a, b) => a + b, 0).toFixed(2)}} ₽
           </div>
         </div>
       </div>
@@ -65,11 +65,13 @@
           </div>
         </div>
         <div key="mode1" class="results-container change-mode-item" v-if="mode === 1">
-          <div class="cd-card whom-cell mt-3 w-100 text-center" v-for="payer in payers" :key="payer">
-            <span class="user">Пользователю {{userById(payer).name}} должны</span>
-            <div class="whom-who-cell-wrapper" v-for="(amount, whom, index) in whom_who[payer]" :key="index">
-              <div class="whom-who-cell text-left" v-if="parseInt(whom) !== payer && amount > 0">
-                {{userById(parseInt(whom)).name}} - {{amount.toFixed(2)}} ₽
+          <div class="whom-cell-wrapper" v-for="payer in payers" :key="payer">
+            <div class="cd-card whom-cell mt-3 w-100 text-center" v-if="Object.values(Object.keys(whom_who[payer]).map((key) => {return parseInt(key) !== payer ? whom_who[payer][key] : 0})).reduce((a, b) => a + b, 0)">
+              <span class="user">Пользователю {{userById(payer).name}} должны</span>
+              <div class="whom-who-cell-wrapper" v-for="(amount, whom, index) in whom_who[payer]" :key="index">
+                <div class="whom-who-cell text-left" v-if="parseInt(whom) !== payer && amount > 0">
+                  {{userById(parseInt(whom)).name}} - {{amount.toFixed(2)}} ₽
+                </div>
               </div>
             </div>
           </div>
@@ -153,6 +155,7 @@ export default {
       }
     },
     showUserMore(user) {
+      console.log(user)
       this.activeUser = user
       this.$bvModal.show("user_modal")
     },
@@ -197,6 +200,7 @@ export default {
   .content{
     background: rgba(255, 255, 255, 0.7);
     padding: 15px 10px;
+    color: var(--main)
   }
 }
 
@@ -346,6 +350,9 @@ html[theme="glass"] .share{
 .share-header{
   font-size: 1.2em;
   font-weight: 500;
+  div{
+    color: var(--main);
+  }
 }
 
 .share-subheader{
@@ -354,6 +361,7 @@ html[theme="glass"] .share{
 
 .copy-link{
   border-radius: 30px;
+  border: none;
   background: var(--btn-background);
   width: 40px;
   height: 40px;

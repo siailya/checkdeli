@@ -11,9 +11,12 @@ import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css';
 
+import VueCookie from 'vue-cookie';
+
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
+Vue.use(VueCookie);
 
 Vue.component('v-select', vSelect)
 new Vue({

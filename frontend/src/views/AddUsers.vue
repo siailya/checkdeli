@@ -39,9 +39,7 @@
               :id="'user_cell_' + index"
           >
             <div class="d-flex w-100 main-content" :id="'main_content_' + index">
-              <div class="avatar">
-                <img :src="'https://icotar.com/initials/' + (user.name || '~') + '?fg=' + mainColor + '&bg=ffffff'" alt="">
-              </div>
+              <cd-avatar :user="user"/>
               <input class="form-control" v-model="user.name"/>
               <i class="material-icons ml-2 mt-auto mb-auto handle">drag_handle</i>
             </div>
@@ -71,6 +69,7 @@
 <script>
 import draggable from 'vuedraggable'
 import {mapActions, mapGetters} from "vuex";
+import CdAvatar from "@/components/CdAvatar";
 
 export default {
   name: "AddUsers",
@@ -82,6 +81,7 @@ export default {
     }
   },
   components: {
+    CdAvatar,
     draggable,
   },
   computed: {
@@ -264,24 +264,11 @@ html[theme="light"] {
   transition: all .3s;
 }
 
-.avatar{
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  min-width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 8px;
-}
-
 .handle{
   color: white;
 }
 
 html[theme="light"] {
-  .avatar {
-    border: 1px solid var(--border);
-  }
-
   .handle{
     color: var(--main);
   }
@@ -289,12 +276,6 @@ html[theme="light"] {
   .next-wrapper{
     box-shadow: none;
     padding: 15px 0;
-  }
-}
-
-html[theme="dark"] {
-  .avatar {
-    border: 1px solid var(--border-light);
   }
 }
 

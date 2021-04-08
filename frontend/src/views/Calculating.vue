@@ -1,5 +1,5 @@
 <template>
-  <div class="calculating-wrapper">
+  <div class="calculating-wrapper page">
     <b-modal id="change_payed" content-class="cd-card" centered hide-header hide-footer>
       <div class="header text-center">Изменить плательщика</div>
       <div class="who text-center">
@@ -12,15 +12,13 @@
           @click="setProductPayed({id: selectedProduct.id, payed: user.id}); selectedProduct = products.find((product) => {return product.id === selectedProduct.id})"
       >
         <div class="d-flex w-100 main-content mb-1" :id="'main_content_' + index">
-          <div class="avatar d-inline-block">
-            <img :src="'https://icotar.com/initials/' + (user.name || '~') + '?fg=' + mainColor + '&bg=ffffff'" alt="">
-          </div>
+          <cd-avatar :user="user"/>
           <div class="name ml-3 align-self-center">
             {{ user.name }}
           </div>
-          <div class="payed-radio ml-auto mt-auto mb-auto">
+          <div class="cd-radio ml-auto mt-auto mb-auto">
             <transition name="bounce">
-              <div class="payed-radio-in" v-if="selectedProduct.payed === user.id">
+              <div class="cd-radio-in" v-if="selectedProduct.payed === user.id">
               </div>
             </transition>
           </div>
@@ -91,25 +89,19 @@
                 </div>
                 <div class="product-users d-flex">
                   <div class="bordered all-product-users text-center" @click="toggleAllUsers(product, index)">
-                    <div class="avatar m-auto">
-                      <transition name="bounce">
-                        <img key="initials" v-if="!allUsersChecked(product)"
-                             :src="'https://icotar.com/initials/' + ('∞') + '?fg=' + mainColor + '&bg=ffffff'" alt="">
-                        <img key="checked" v-else :src="'https://icotar.com/initials/∞?fg=ffffff&bg=' + mainColor" alt="">
-                      </transition>
-                    </div>
+                    <cd-avatar key="initials" class="m-auto" all-users :checked="allUsersChecked(product)" :src="'https://icotar.com/initials/' + ('∞') + '?fg=' + mainColor + '&bg=ffffff'" alt=""/>
                     Все
                   </div>
                   <div class="bordered product-user text-center" @click="toggleProductUser(index, user.id)"
                        v-for="(user, user_index) in users" :key="user_index">
-                    <div class="avatar m-auto"
-                         :style="product.users.indexOf(user.id) === -1 ? 'background: white' : 'background: var(--main)'">
-                      <transition name="bounce">
-                        <img key="initials" v-if="product.users.indexOf(user.id) === -1"
-                             :src="'https://icotar.com/initials/' + (user.name || '~') + '?fg=' + mainColor + '&bg=ffffff'" alt="">
-                        <img key="checked" v-else :src="'https://icotar.com/initials/✓?fg=ffffff&bg=' + mainColor" alt="">
-                      </transition>
-                    </div>
+<!--                    <div class="avatar m-auto"-->
+<!--                         :style="product.users.indexOf(user.id) === -1 ? 'background: white' : 'background: var(&#45;&#45;main)'">-->
+<!--                      <transition name="bounce">-->
+<!--                        <img key="initials" v-if="product.users.indexOf(user.id) === -1" :src="'https://icotar.com/initials/' + (user.name || '~') + '?fg=' + mainColor + '&bg=ffffff'" alt="">-->
+<!--                        <img key="checked" v-else :src="'https://icotar.com/initials/✓?fg=ffffff&bg=' + mainColor" alt="">-->
+<!--                      </transition>-->
+<!--                    </div>-->
+                    <cd-avatar class="m-auto" :user="user" :checked="product.users.indexOf(user.id) !== -1"/>
                     {{ user.name }}
                   </div>
                 </div>
@@ -152,10 +144,12 @@
 import {mapActions, mapGetters} from "vuex";
 // eslint-disable-next-line no-unused-vars
 import jwt from "jsonwebtoken";
+import CdAvatar from "@/components/CdAvatar";
 
 
 export default {
   name: "Calculating",
+  components: {CdAvatar},
   data() {
     return {
       drag: false,
@@ -353,8 +347,8 @@ export default {
         let one_pay = parseFloat((product.cost / product.users.length).toFixed(2))
         this.users.forEach((user) => {
           if (product.users.indexOf(user.id) !== -1) {
-            if(user.products.find((prd) => {return prd.product.id === product.id}) === undefined){
-              user.products.push({product: product, amount: one_pay})
+            if(user.products.find((prd) => {return prd.product_id === product.id}) === undefined){
+              user.products.push({product_id: product.id, amount: one_pay})
             }
             who_whom[user.id][product.payed] = (who_whom[user.id][product.payed] || 0) + one_pay
             whom_who[product.payed][user.id] = (whom_who[product.payed][user.id] || 0) + one_pay
@@ -362,6 +356,7 @@ export default {
         })
       })
 
+      // Балансировка
       if (payers.length >= 2) {
         payers.forEach((payer_id) => {
           payers.forEach((payer_id2) => {
@@ -383,7 +378,8 @@ export default {
       }
 
       console.log('Все раскидано примерно за', performance.now() - time, 'мс')
-
+      console.log(this.$store.state.users.users)
+      console.log(JSON.stringify(this.$store.state.users.users).length)
       this.$store.commit("updatePayers", payers)
       this.$store.commit("updateWhomWho", whom_who)
       this.$store.commit("updateWhoWhom", who_whom)
@@ -674,74 +670,8 @@ html[theme="light"]{
   font-size: 20px;
 }
 
-.payed-radio {
-  border-radius: 50px;
-  border: var(--border) solid 2px;
-  height: 18px;
-  width: 18px;
-  padding: 2px;
-
-  .payed-radio-in {
-    width: 100%;
-    height: 100%;
-    background: var(--main);
-    border-radius: 50px;
-    transition: all .3s;
-  }
-}
-
 .next-btn.shadowed{
   box-shadow: 0 5px 10px 2px rgba(50, 50, 50, 0.15);
-}
-
-</style>
-
-<style>
-.bounce-enter-active {
-  animation: bounce-in .3s;
-}
-
-.bounce-leave-active {
-  animation: bounce-in .3s reverse;
-}
-
-@keyframes bounce-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.slide-up-enter-active {
-  animation: slide-up .3s;
-}
-
-.slide-up-leave-active {
-  animation: slide-up .3s reverse;
-}
-
-@keyframes slide-up {
-  0% {
-    opacity: 0;
-    transform: translate(0, 200px);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0);
-  }
-}
-
-.slide-left-enter, .slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(200px);
-}
-
-.slide-left-leave-active {
-  position: absolute;
 }
 
 </style>

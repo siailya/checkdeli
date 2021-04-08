@@ -105,4 +105,7 @@ dist
 package-lock.json
 .idea
 .firebase
-yarn.lock
+*/yarn.lock
+*/node_modules
+*/package-lock.json
+*/dist

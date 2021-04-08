@@ -1,53 +1,55 @@
+<script src="store/modules/products.js"></script>
 <template>
   <div id="app">
-    <div class="page">
-      <transition name="slide-right">
-        <div id="cookies_accept" class="cd-card adaptive-width" v-if="cookies !== 'true'">
-        <div class="header text-center color-text">
-          Мы используем куки!
-        </div>
-        <div class="text-center cookies-text mt-3">
-          Без кук все работало бы через жопу, а мы не смогли бы получать статистику.
-        </div>
-        <div class="text-center mt-2">
-          <button class="show-full" v-b-modal.full_policy_text>То же самое, но с терминами</button>
-        </div>
-        <div class="accept text-center mt-3">
-          <button class="accept-btn color-text active-btn" @click="acceptCookies">
-            Принять и продолжить
-          </button>
-        </div>
+    <transition name="slide-right">
+      <div id="cookies_accept" class="cd-card adaptive-width" v-if="cookies !== 'true'">
+      <div class="header text-center color-text">
+        Мы используем куки!
       </div>
-      </transition>
-
-      <b-modal id="full_policy_text" hide-header hide-footer content-class="cd-card" centered>
-        <div class="full-policy-text">
-          <div class="close" @click="$bvModal.hide('full_policy_text')">
-            <i class="material-icons">close</i>
-          </div>
-          Сайт «Чекдели», расположенный в сети Интернет по адресу checkdeli.online использует сервис веб-аналитики Яндекс.Метрика, предоставляемый компанией ООО «ЯНДЕКС», 119021, Россия, Москва, ул. Л. Толстого, 16 (далее — Яндекс).
-          <br>
-          <br>
-          Сервис Яндекс.Метрика использует технологию «cookie» — небольшие текстовые файлы, размещаемые на компьютере пользователей с целью анализа их пользовательской активности.
-          <br>
-          <br>
-          Собранная при помощи cookie информация не может идентифицировать вас, однако может помочь нам улучшить работу нашего сайта. Информация об использовании вами данного сайта, собранная при помощи cookie, будет передаваться Яндексу и храниться на сервере Яндекса в ЕС и Российской Федерации. Яндекс будет обрабатывать эту информацию для оценки использования вами сайта, составления для нас отчетов о деятельности нашего сайта, и предоставления других услуг. Яндекс обрабатывает эту информацию в порядке, установленном в условиях использования сервиса Яндекс.Метрика.
-          <br>
-          <br>
-          Вы можете отказаться от использования cookies, выбрав соответствующие настройки в браузере. Также вы можете использовать инструмент — https://yandex.ru/support/metrika/general/opt-out.html. Однако это может повлиять на работу некоторых функций сайта. Используя этот сайт, вы соглашаетесь на обработку данных о вас Яндексом в порядке и целях, указанных выше.
-          <br>
-          <br>
-          Так же сайт использует технологию «LocalStorage», позволяющую хранить пользовательские данные на устройстве между сессиями. Для продолжения работы вы так же соглашаетесь с тем фактом, что некоторые введенные вами данные будут храниться между сессиями.
-        </div>
-      </b-modal>
-      <transition name="fade" mode="out-in" appear>
-        <router-view/>
-      </transition>
+      <div class="text-center cookies-text mt-3">
+        Без кук все работало бы через жопу, а мы не смогли бы получать статистику.
+      </div>
+      <div class="text-center mt-2">
+        <button class="show-full" v-b-modal.full_policy_text>То же самое, но с терминами</button>
+      </div>
+      <div class="accept text-center mt-3">
+        <button class="accept-btn color-text active-btn" @click="acceptCookies">
+          Принять и продолжить
+        </button>
+      </div>
     </div>
+    </transition>
+
+    <b-modal id="full_policy_text" hide-header hide-footer content-class="cd-card" centered>
+      <div class="full-policy-text">
+        <div class="close" @click="$bvModal.hide('full_policy_text')">
+          <i class="material-icons">close</i>
+        </div>
+        Сайт «Чекдели», расположенный в сети Интернет по адресу checkdeli.online использует сервис веб-аналитики Яндекс.Метрика, предоставляемый компанией ООО «ЯНДЕКС», 119021, Россия, Москва, ул. Л. Толстого, 16 (далее — Яндекс).
+        <br>
+        <br>
+        Сервис Яндекс.Метрика использует технологию «cookie» — небольшие текстовые файлы, размещаемые на компьютере пользователей с целью анализа их пользовательской активности.
+        <br>
+        <br>
+        Собранная при помощи cookie информация не может идентифицировать вас, однако может помочь нам улучшить работу нашего сайта. Информация об использовании вами данного сайта, собранная при помощи cookie, будет передаваться Яндексу и храниться на сервере Яндекса в ЕС и Российской Федерации. Яндекс будет обрабатывать эту информацию для оценки использования вами сайта, составления для нас отчетов о деятельности нашего сайта, и предоставления других услуг. Яндекс обрабатывает эту информацию в порядке, установленном в условиях использования сервиса Яндекс.Метрика.
+        <br>
+        <br>
+        Вы можете отказаться от использования cookies, выбрав соответствующие настройки в браузере. Также вы можете использовать инструмент — https://yandex.ru/support/metrika/general/opt-out.html. Однако это может повлиять на работу некоторых функций сайта. Используя этот сайт, вы соглашаетесь на обработку данных о вас Яндексом в порядке и целях, указанных выше.
+        <br>
+        <br>
+        Так же сайт использует технологию «LocalStorage», позволяющую хранить пользовательские данные на устройстве между сессиями. Для продолжения работы вы так же соглашаетесь с тем фактом, что некоторые введенные вами данные будут храниться между сессиями.
+      </div>
+    </b-modal>
+    <transition name="fade" mode="out-in" appear>
+      <router-view/>
+    </transition>
   </div>
 </template>
 
 <script>
+import {mapActions} from "vuex";
+import VK from "vk-openapi";
+
 export default {
   name: "App",
   data () {
@@ -57,6 +59,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["restoreVK"]),
     acceptCookies() {
       window.localStorage.setItem("cookies", "true")
       this.cookies = "true"
@@ -68,6 +71,18 @@ export default {
       const fromDepth = from.path.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : toDepth === fromDepth ? 'fade' : 'slide-right'
     }
+  },
+  created() {
+    VK.init({
+      apiId: 7803894
+    })
+
+
+    VK.Auth.getLoginStatus((e) => {
+      if (e.status === "connected") {
+        this.restoreVK(e)
+      }
+    }, true)
   }
 }
 </script>
@@ -96,6 +111,7 @@ html[theme="glass"]{
 }
 
 html[theme="light"]{
+  --background: #fff;
   --main: #fd9b5c;
   --text-color: #929292;
   --text-secondary: #b3b3b3;
@@ -137,7 +153,7 @@ html[theme="light"]{
 }
 
 .color-text{
-  color: var(--main);
+  color: var(--main)!important;
   transition: all .3s;
 }
 
@@ -177,12 +193,16 @@ html[theme="light"]{
     border: 1px solid var(--border)!important;
   }
 
-  .form-control:focus{
+  .form-control:focus, .form-control.focus{
     box-shadow: 0 0 0 0.2rem rgb(235, 150, 60, 0.25) !important;
   }
 }
 
 html[theme="dark"]{
+  div{
+    color: var(--text-color);
+  }
+
   .cd-card {
     background: var(--background);
     //box-shadow: 0 0px 5px 1px rgba(255, 255, 255, 0.25);
@@ -202,14 +222,16 @@ html[theme="dark"]{
 
   .form-control{
     border: 1px solid var(--border)!important;
+    background-color: var(--btn-background)!important;
+    color: var(--text-color);
   }
 
-  .form-control:focus{
-    box-shadow: 0 0 0 0.2rem rgb(235, 150, 60, 0.25) !important;
+  .form-control:focus, .form-control.focus{
+    box-shadow: 0 0 0 0.2rem rgba(235, 185, 60, 0.15) !important;
   }
 }
 
-.form-control:focus{
+.form-control:focus, .form-control.focus{
   border-color: var(--main)!important;
   box-shadow: 0 0 0 0.2rem rgb(0 0 235 / 25%)!important;
 }
@@ -368,6 +390,73 @@ html[theme="light"] .cd-card.modal-content {
 .slide-right-leave-active {
   position: absolute;
 }
+
+.sortable-drag {
+  opacity: 0!important;
+}
+
+.cd-radio {
+  border-radius: 50px;
+  border: var(--border) solid 2px;
+  height: 18px;
+  min-width: 18px;
+  padding: 2px;
+
+  .cd-radio-in {
+    width: 100%;
+    height: 100%;
+    background: var(--main);
+    border-radius: 50px;
+    transition: all .3s;
+  }
+}
+
+.bounce-enter-active {
+  animation: bounce-in .3s;
+}
+
+.bounce-leave-active {
+  animation: bounce-in .3s reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.slide-up-enter-active {
+  animation: slide-up .3s;
+}
+
+.slide-up-leave-active {
+  animation: slide-up .3s reverse;
+}
+
+@keyframes slide-up {
+  0% {
+    opacity: 0;
+    transform: translate(0, 200px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+.slide-left-enter, .slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(200px);
+}
+
+.slide-left-leave-active {
+  position: absolute;
+}
+
 </style>
 
 <style scoped lang="scss">
@@ -417,4 +506,5 @@ html[theme="glass"]{
     color: var(--text-color);
   }
 }
+
 </style>

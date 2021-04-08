@@ -1,5 +1,5 @@
 <template>
-  <div class="intro">
+  <div class="intro page">
     <div class="intro-slider mt-4">
       <transition name="slide-right" appear>
         <div key="12312" class="intro-slide text-center" v-if="activeSlide === 0">
