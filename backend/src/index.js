@@ -1,4 +1,6 @@
 import {CDUser, Check} from "./database/Models";
+require("babel-core/register");
+require("babel-polyfill");
 
 const express = require("express")
 const history = require('connect-history-api-fallback')
@@ -62,6 +64,24 @@ app.post(APIv1 + "/checks/create", ((req, res) => {
         user.save()
         res.send({status: "Successfully created", cdid: r._id})
     })
+}))
+
+app.post(APIv1 + "/checks/update", (async (req, res) => {
+    let cdid = req.body.cd.cdid
+
+    let check = await Check.findById(cdid)
+
+    check.defaultPayed = req.body.cd.defaultPayed
+    check.products = req.body.cd.products
+    check.users = req.body.cu
+    check.save()
+
+    res.send({status: "Updated", cdid: cdid})
+}))
+
+app.get(APIv1 + "/checks/getbyid/:cdid", (async (req, res) => {
+    let check = await Check.findById(req.params.cdid)
+    res.send(check)
 }))
 
 app.listen(port, () => {

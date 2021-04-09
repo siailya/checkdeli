@@ -15,6 +15,23 @@ export const CDUserSchema = new Schema({
 export const CheckSchema = new Schema({
     title: String,
     date: Date,
-    user: {type: Schema.Types.ObjectId, ref: "CDUser"}
+    user: {type: Schema.Types.ObjectId, ref: "CDUser"},
+    defaultPayed: Number,
+    products: [{
+        id: Number,
+        title: String,
+        quantity: Number,
+        cost: String || Number,
+        users: [ Number ],
+        payed: Number
+    }],
+    users: [{
+        name: String,
+        id: Number,
+        products: [{
+            product_id: Number,
+            amount: Number
+        }]
+    }]
 })
 
