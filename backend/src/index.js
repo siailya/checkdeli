@@ -21,6 +21,14 @@ app.use(history({
 }))
 app.use(staticFileMiddleware)
 
+app.get("/robots.txt", ((req, res) => {
+    res.sendFile("../frontend/robots.txt")
+}))
+
+app.get("/sitemap.xml", ((req, res) => {
+    res.sendFile("../frontend/sitemap.xml")
+}))
+
 app.post(APIv1 + "/login/vk", (async (req, res) => {
     let user = await CDUser.findOne({vkid: req.body.vkid})
     if (user) {
