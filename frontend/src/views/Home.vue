@@ -43,7 +43,7 @@
         </button>
       </div>
     </b-modal>
-    <section class="page home">
+    <header class="page home">
       <div class="theme-changer cd-card">
         <button class="change-theme d-flex" @click="changeTheme">
           <i class="material-icons mt-auto mb-auto">{{themePic}}</i>
@@ -70,22 +70,24 @@
         </h2>
       </div>
       <div class="buttons-wrapper">
-        <div class="cd-card mr-1">
+        <div class="cd-card">
           <button @click="start" class="start active-btn">
             <span class="color-text">Начать!</span>
           </button>
         </div>
-        <div class="cd-card ml-1">
-          <button @click="$router.push('/intro')" class="about active-btn">
-            <span class="color-text">?</span>
-          </button>
-        </div>
+<!--        <div class="cd-card ml-1">-->
+<!--          <button @click="$router.push('/intro')" class="about active-btn">-->
+<!--            <span class="color-text">?</span>-->
+<!--          </button>-->
+<!--        </div>-->
       </div>
-    </section>
+    </header>
 
     <div class="waves">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="var(--border)" fill-opacity="1" d="M0,224L80,234.7C160,245,320,267,480,229.3C640,192,800,96,960,80C1120,64,1280,128,1360,160L1440,192L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>
+      <div class="back-wave" id="back-wave"></div>
+      <div class="front-wave"></div>
     </div>
+
     <section class="story">
       <div class="story-content page home">
         <div class="story-chapter beginning d-flex">
@@ -98,12 +100,12 @@
             </div>
           </div>
           <div class="image">
-            <img src="../assets/gena1.png" alt="">
+            <img src="../assets/story/gena1.png" alt="">
           </div>
         </div>
         <div class="story-chapter middle d-flex">
           <div class="image">
-            <img src="../assets/gena2.png" alt="">
+            <img src="../assets/story/gena2.png" alt="">
           </div>
           <div class="text">
             <div class="story-header">
@@ -124,16 +126,124 @@
             </div>
           </div>
           <div class="image">
-            <img src="../assets/gena3.png" alt="">
+            <img src="../assets/story/gena3.png" alt="">
           </div>
         </div>
-        АААА КРОКОДИЛ В ЧЕКДЕЛИ
+      </div>
+      <div class="d-flex justify-content-center">
+        <button @click="start" class="start-story active-btn mb-2">
+          Хочу как Гена!
+        </button>
+      </div>
+      <div class="omg-crocodile text-center pb-3">
+        <a href="https://www.youtube.com/watch?v=W7caMnPB-6A">Аааа! Крокодил в Чекдели!</a>
       </div>
     </section>
-<!--    <div class="fixed-bottom">-->
-<!--      <a href="https://vk.com/overcreated" class="madeby align-items-center">Сделано {{["overcreated", "siailya"][Math.floor(Math.random() * 2)]}} c <i class="material-icons" style="color: var(&#45;&#45;wrong); font-size: 15px">favorite</i></a>-->
-<!--      <div class="ver">v1.0.4b</div>-->
-<!--    </div>-->
+
+    <section class="features page home">
+      <h1 class="features-header text-center color-text">Как разделить чеки?</h1>
+      <h2 class="features-subheader text-center mt-1">Всего простых 3 шага!</h2>
+      <div class="steps">
+        <div class="step first-step mt-5">
+          <div class="step-info">
+            <div class="step-counter">
+              1
+            </div>
+            <div v-tilt="{max: 5, glare: true}" class="step-text cd-card">
+              <h3>Добавляй людей</h3>
+              <div class="step-description">
+                Добавляй всех, кто был с тобой и что-то пил или ел. Не добавляй тех, кто не любит пиццу!
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step second-step">
+          <div class="step-info">
+            <div class="step-counter">
+              2
+            </div>
+            <div v-tilt="{max: 5, glare: true}" class="step-text cd-card">
+              <h3>Добавляй позиции</h3>
+              <div class="step-description">
+                Укажи пользователей под каждой позицией из чека и выбери того, кто ее оплатил
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step third-step">
+          <div class="step-info">
+            <div class="step-counter">
+              3
+            </div>
+            <div v-tilt="{max: 5, glare: true}" class="step-text cd-card">
+              <h3>Проверяй результаты</h3>
+              <div class="step-description">
+                Чекдели сам посчитает, кто сколько и кому должен. Да, даже если платил не один человек!
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step fourth-step лол_какой_четвертый_это_же_3.1">
+          <div class="step-info">
+            <div class="step-counter">
+              3.1
+            </div>
+            <div v-tilt="{max: 5, glare: true}" class="step-text cd-card">
+              <h3>Делись с друзьями</h3>
+              <div class="step-description">
+                Отправляй друзьям ссылку, чтобы каждый проверил лично, и можно начинать заново!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="for-what">
+      <div class="for-what-content page home">
+        <h1 class="for-what-header text-center color-text">Зачем нужен Чекдели?</h1>
+        <h2 class="for-what-subheader text-center">Действительно. Зачем?</h2>
+        <div v-tilt="{max: 5, glare: true}" class="fw already cd-card">
+          <img src="../assets/stopwatch.png" alt="">
+          <h3>Для тех, кто хочет сейчас</h3>
+          <div>Нужен только телефон и чуть-чуть интернета!</div>
+        </div>
+        <div v-tilt="{max: 5, glare: true}" class="fw big cd-card">
+          <img src="../assets/people.png" alt="">
+          <h3>Для больших компаний</h3>
+          <div>Трудно вспомнить, кто что ел? Не беда!</div>
+        </div>
+        <div v-tilt="{max: 5, glare: true}" class="fw calc cd-card">
+          <img src="../assets/calc.png" alt="">
+          <h3>Для тех, кто устал считать</h3>
+          <div>Никаких калькуляторов и Excel!</div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+          <button @click="start" class="start-story active-btn mb-2">
+            Попробуй!
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer text-center p-3">
+      <div class="checkdeli color-text">
+        Чекдели -
+        <br>
+        делить чеки просто!
+      </div>
+      <div class="contacts mt-2 mb-2">
+        По всем вопросам, предложениям и жалобам - <a href="https://vk.com/overcreated">vk.com/overcreated</a>
+      </div>
+      <div class="copy">
+        &copy; 2021 Чекдели
+      </div>
+      <div class="cd-info">
+        <a href="https://vk.com/overcreated" class="madeby align-items-center">Сделано {{["overcreated", "siailya"][Math.floor(Math.random() * 2)]}} c <i class="material-icons" style="color: var(--wrong); font-size: 15px">favorite</i></a>
+        <div class="ver">v1.1.0a</div>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -187,6 +297,12 @@ export default {
         this.$bvModal.show("login_modal")
       }
     }
+  },
+  mounted() {
+    window.addEventListener("scroll", () => {
+      let back = document.getElementById("back-wave")
+      back.style.transform = `translateY(${window.pageYOffset / 15}px)`
+    })
   }
 }
 </script>
@@ -274,7 +390,7 @@ export default {
   }
 }
 
-.start, .about{
+.start, .about, .start-story{
   border-radius: 30px;
   padding: 8px 20px;
   font-size: 20px;
@@ -287,37 +403,209 @@ export default {
 
 html[theme="dark"]{
   .start, .about{
-    background: var(--background-light);
+    background: var(--background-secondary);
   }
 }
 
-.start:hover, .about:hover{
+.start:hover, .about:hover, .start-story:hover{
   opacity: 0.7;
 }
 
 .story{
-  background-color: var(--border);
+  background-color: var(--background-secondary);
+  z-index: 10;
+  padding-top: 6vh;
+}
+
+.start-story{
+  background-color: var(--main);
+  color: white!important;
 }
 
 .waves{
   width: 100vw;
-  margin-top: 15vh;
+  margin-top: 12vh;
   position: relative;
   left: 0;
+  z-index: -1000;
+}
+
+.front-wave{
+  background-color: var(--background-secondary);
+  mask-image: url("../assets/waves/front-wave.svg");
+  -webkit-mask-image: url("../assets/waves/front-wave.svg");
+  mask-repeat: repeat-x;
+  -webkit-mask-repeat: repeat-x;
+  height: 15vh;
+  background-position: bottom;
+  mask-position: bottom;
+  -webkit-mask-position: bottom;
+  animation: wave 8s infinite cubic-bezier(0.4, 0.4, 0.4, 0.4), wave-translation 3s infinite;
+  margin-bottom: -2px;
+}
+
+.back-wave{
+  background-color: var(--background-thirdly);
+  mask-image: url("../assets/waves/back-wave.svg");
+  -webkit-mask-image: url("../assets/waves/back-wave.svg");
+  mask-repeat: repeat-x;
+  -webkit-mask-repeat: repeat-x;
+  height: 15vh;
+  background-position: bottom;
+  mask-position: bottom;
+  -webkit-mask-position: bottom;
+  position: relative;
+  top: 13vh;
+  animation: wave 5s infinite cubic-bezier(0.5, 0.4, 0.4, 0.5);
+}
+
+@keyframes wave {
+  0% {
+    mask-position: bottom;
+    -webkit-mask-position: bottom;
+  }
+
+  100% {
+    mask-position: 100vw bottom;
+    -webkit-mask-position: 100vw bottom;
+  }
+}
+
+@keyframes wave-translation {
+  0%, 100% {
+   transform: translateY(0);
+  }
+
+  50%{
+   transform: translateY(5px);
+  }
 }
 
 .story-chapter{
   padding: 15px 0;
   .text{
+    margin: auto;
     .story-header{
-      font-size: 1.2em;
+      font-size: 1.5em;
       font-weight: 500;
     }
   }
   .image{
     img{
+      width: 90%;
+    }
+  }
+}
+
+.story-chapter.beginning, .story-chapter.end{
+  text-align: right;
+}
+
+.story-chapter.middle{
+  text-align: left;
+}
+
+.omg-crocodile{
+  font-size: 0.7em;
+  opacity: 0.3;
+  a{
+    color: var(--text-color)!important;
+    text-decoration: underline;
+  }
+}
+
+.features{
+  padding: 16px;
+}
+
+.features-header, .for-what-header{
+  font-size: 2em;
+  margin: 0;
+  color: var(--text-color)
+}
+
+.features-subheader, .for-what-subheader{
+  font-size: 1.2em;
+  font-weight: 400;
+}
+
+.steps{
+  h3{
+    font-size: 1.2em;
+    color: var(--main);
+  }
+}
+
+.step {
+  margin-bottom: 6vh;
+  .step-info {
+    display: flex;
+
+    .step-counter{
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 50px;
+      background-color: var(--main);
+      min-width: 50px;
+      height: 50px;
+      align-items: center;
+      margin: auto 20px auto 0;
+      color: white;
+      font-size: 1.3em;
+      font-weight: 500;
+    }
+
+    .step-text{
       width: 100%;
     }
+  }
+  text-align: left;
+}
+
+.step-counter::after{
+  content: "";
+  width: 3px;
+  height: 130px;
+  background-color: var(--main);
+  display: block;
+  color: white;
+  z-index: -1;
+  position: absolute;
+  margin-top: 170px;
+}
+
+.fourth-step{
+  .step-counter::after{
+    content: none;
+  }
+}
+
+.for-what{
+  padding: 16px 0;
+  background-color: var(--background-secondary);
+}
+
+.fw{
+  margin: 3vh;
+  img{
+    width: 25%;
+  }
+  h3{
+    font-size: 1.5em;
+    margin: 0;
+  }
+}
+
+.checkdeli{
+  font-size: 1.3em;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.contacts{
+  a{
+    color: var(--text-color);
   }
 }
 
@@ -327,6 +615,7 @@ html[theme="dark"]{
 
 .ver{
   opacity: 0.7;
+  font-weight: 300;
 }
 
 .login-header{

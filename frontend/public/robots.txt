@@ -1,3 +1,7 @@
 User-agent: *
 Crawl-delay: 1
 Host: checkdeli.online
+Disallow: /addusers
+Disallow: /calculating
+Disallow: /results/
+Disallow: /home

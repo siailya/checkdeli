@@ -198,7 +198,7 @@ html[theme="glass"] .users-container{
 
 html[theme="dark"]{
   .button-wrapper {
-    background: var(--background-light);
+    background: var(--background-secondary);
   }
 }
 

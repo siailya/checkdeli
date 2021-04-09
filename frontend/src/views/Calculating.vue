@@ -459,7 +459,7 @@ html[theme="dark"]{
 
 html[theme="dark"]{
   .button-wrapper {
-    background: var(--background-light);
+    background: var(--background-secondary);
   }
 }
 
@@ -561,7 +561,7 @@ html[theme="light"] .other-content {
 
 html[theme="dark"] .other-content {
   border: solid var(--border) .5px;
-  background: var(--background-light);
+  background: var(--background-secondary);
 }
 
 .delete-product-btn, .payed-product-btn, .copy-product-btn {
@@ -587,7 +587,7 @@ html[theme="dark"] .other-content {
 
 html[theme="dark"] {
   .payed-product-btn, .copy-product-btn{
-    background: var(--background-light);
+    background: var(--background-secondary);
   }
 }
 

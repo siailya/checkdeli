@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import meme from "../assets/meme1.png"
+import meme from "../assets/backq.jpg"
 
 export default {
   name: "Intro",

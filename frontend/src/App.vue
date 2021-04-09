@@ -1,4 +1,3 @@
-<script src="store/modules/products.js"></script>
 <template>
   <div id="app">
     <transition name="slide-right">
@@ -77,7 +76,6 @@ export default {
       apiId: 7803894
     })
 
-
     VK.Auth.getLoginStatus((e) => {
       if (e.status === "connected") {
         this.restoreVK(e)
@@ -118,6 +116,11 @@ html[theme="light"]{
   --border: #e2e2e2;
   --wrong: #ff565c;
   --btn-background: white;
+  --background-secondary: #e3e3e3;
+  --background-thirdly: #b3b3b3;
+  body{
+    color: var(--text-color)!important;
+  }
 }
 
 html[theme="dark"]{
@@ -130,9 +133,12 @@ html[theme="dark"]{
   --wrong: #fd7287;
   --btn-background: #5f5f5f;
   --background: #414141;
-  --background-light: #5f5f5f;
-  --background-lighter: #888888;
+  --background-secondary: #5f5f5f;
+  --background-thirdly: #888888;
   background-color: #2b2b2b!important;
+  body{
+    color: var(--text-color)!important;
+  }
 }
 
 html[theme="glass"]{

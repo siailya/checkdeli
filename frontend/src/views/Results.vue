@@ -206,7 +206,7 @@ export default {
 
 html[theme="dark"] {
   .content{
-    background: var(--background-light);
+    background: var(--background-secondary);
   }
 }
 
@@ -267,7 +267,7 @@ html[theme="light"]{
 
 html[theme="dark"]{
   .slider{
-    background: var(--background-lighter);
+    background: var(--background-thirdly);
     //box-shadow: 0 0 10px 5px rgba($light_dark, 0.2)!important;
   }
 }
@@ -295,7 +295,7 @@ html[theme="dark"]{
 
 html[theme="dark"] {
   .who-cell, .whom-cell {
-    background: var(--background-light)!important;
+    background: var(--background-secondary)!important;
     border: solid 1px var(--border);
   }
 }
