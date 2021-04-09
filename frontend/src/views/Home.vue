@@ -11,14 +11,14 @@
         <div class="login-with-list d-flex justify-content-center">
           <img width="42" height="42" @click="() => loginVK([$bvModal, $router])" src="@/assets/logo_vk_color_28.svg" alt="VK">
         </div>
-        <div class="or-login text-center mt-1 mb-1">
-          - или -
-        </div>
-        <div class="login-password">
-          <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email" @input="checkAccount">
-          <input type="password" class="form-control" placeholder="Пароль" v-model="password">
-          <div class="account-info" v-if="email"></div>
-        </div>
+<!--        <div class="or-login text-center mt-1 mb-1">-->
+<!--          - или - -->
+<!--        </div>-->
+<!--        <div class="login-password">-->
+<!--          <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email" @input="checkAccount">-->
+<!--          <input type="password" class="form-control" placeholder="Пароль" v-model="password">-->
+<!--          <div class="account-info" v-if="email"></div>-->
+<!--        </div>-->
         <div class="or-login text-center mt-1 mb-1">
           - или -
         </div>
@@ -202,7 +202,7 @@
     <section class="for-what">
       <div class="for-what-content page home">
         <h1 class="for-what-header text-center color-text">Зачем нужен Чекдели?</h1>
-        <h2 class="for-what-subheader text-center">Действительно. Зачем?</h2>
+        <h2 class="for-what-subheader text-center">Действительно. Зачем? И для кого?</h2>
         <div v-tilt="{max: 5, glare: true}" class="fw already cd-card">
           <img src="../assets/stopwatch.png" alt="">
           <h3>Для тех, кто хочет сейчас</h3>
@@ -271,6 +271,10 @@ export default {
       }
     }
   },
+  beforeRouteLeave(to, from, next) {
+    window.removeEventListener("scroll", this.listenScroll)
+    next()
+  },
   methods: {
     ...mapActions(["loginVK"]),
     changeTheme() {
@@ -296,14 +300,15 @@ export default {
       } else {
         this.$bvModal.show("login_modal")
       }
+    },
+    listenScroll () {
+      let back = document.getElementById("back-wave")
+      back.style.transform = `translateY(${window.pageYOffset / 15}px)`
     }
   },
   mounted() {
-    window.addEventListener("scroll", () => {
-      let back = document.getElementById("back-wave")
-      back.style.transform = `translateY(${window.pageYOffset / 15}px)`
-    })
-  }
+    window.addEventListener("scroll", this.listenScroll)
+  },
 }
 </script>
 

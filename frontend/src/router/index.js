@@ -11,7 +11,7 @@ const routes = [
         component: Home,
         meta: {
             title: null
-        }
+        },
     },
     {
         path: '/addusers',

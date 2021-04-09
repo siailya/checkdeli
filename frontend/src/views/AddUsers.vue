@@ -163,7 +163,7 @@ export default {
         showWrong("Стоит всем дать имена!")
       } else {
         this.$router.push("/calculating")
-        this.setDefaultPayed(this.users[0].id)
+        this.setDefaultPayed(parseInt(this.users[0].id))
       }
     }
   }

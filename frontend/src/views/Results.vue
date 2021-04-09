@@ -78,13 +78,13 @@
         </div>
       </transition-group>
     </div>
-    <div class="fromurl-edit cd-card" v-show="fromURL">
-      <button class="edit-url-btn d-flex w-100 justify-content-center" @click="$router.push('/addusers')">
-        <i class="material-icons mr-1">edit</i>
-        Редактировать
-        <span class="beta">BETA</span>
-      </button>
-    </div>
+<!--    <div class="fromurl-edit cd-card" v-show="fromURL">-->
+<!--      <button class="edit-url-btn d-flex w-100 justify-content-center" @click="$router.push('/addusers')">-->
+<!--        <i class="material-icons mr-1">edit</i>-->
+<!--        Редактировать-->
+<!--        <span class="beta">BETA</span>-->
+<!--      </button>-->
+<!--    </div>-->
     <div class="cd-card share mt-3 mb-4">
       <div class="text-center share-header color-text d-flex justify-content-center">
         <div class="text-center">
@@ -101,14 +101,15 @@
           <i class="material-icons mt-auto mb-auto">content_copy</i>
         </button>
       </div>
-      <div class="notice mt-2">Длинные ссылки могут не открыться в некоторых браузерах, а так же не отправиться в мессенджерах</div>
     </div>
   </div>
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 import {Base64} from 'js-base64';
+import axios from "axios";
+import {APIv1, BACKEND} from "../../backend.config";
 Base64.extendString();
 
 export default {
@@ -117,19 +118,26 @@ export default {
     return {
       mode: 0,
       activeUser: {products: []},
-      fromURL: false
+      fromURL: false,
+      shareLink: ""
     }
   },
   computed: {
-    ...mapGetters(["users", "payers", "who_whom", "whom_who", "userById", "productById"]),
-    shareLink() {
-      let tokenized = JSON.stringify(this.$store.state).toBase64URL()
-      // console.log(JSON.stringify(this.$store.state))
-      console.log("Share link decoded:", tokenized)
-      return "https://checkdeli.online/results/" + tokenized
-    }
+    ...mapGetters(["users", "products", "payers", "who_whom", "whom_who", "userById", "productById", "CDUser", "checkTitle", "checkDate"]),
   },
   methods: {
+    ...mapActions(["setCDID"]),
+    createCheck() {
+      axios.post(BACKEND + APIv1 + "/checks/create", {title: this.checkTitle, date: Date.parse(this.checkDate)}).then((r) => {
+        if (r.data.status === "Successfully created") {
+          this.setCDID(r.data.cdid)
+
+          axios.post(BACKEND + APIv1 + "/checks/update", {cd: this.$store.state.products, cu: this.$store.state.users.users}).then((r) => {
+            this.shareLink = "https://checkdeli.online/results/" + r.data.cdid
+          })
+        }
+      })
+    },
     toggleMode(mode) {
       function activate(id) {
         let btn = document.getElementById(id)
@@ -161,21 +169,78 @@ export default {
     },
     copyLink() {
       navigator.clipboard.writeText("Разделенный чек можно посмотреть тут: \n\n" + this.shareLink)
+    },
+    calculateResults() {
+      let who_whom = {}, whom_who = {}, payers = [];
+      let time = performance.now();
+
+      this.users.forEach((user) => {
+        who_whom[user.id] = {}
+      })
+
+      this.products.forEach((product) => {
+        if (payers.indexOf(product.payed) === -1){
+          payers.push(product.payed)
+          whom_who[product.payed] = {}
+        }
+        let one_pay = parseFloat((product.cost / product.users.length).toFixed(2))
+        this.users.forEach((user) => {
+          if (product.users.indexOf(user.id) !== -1) {
+            if(user.products.find((prd) => {return prd.product_id === product.id}) === undefined){
+              user.products.push({product_id: product.id, amount: one_pay})
+            }
+            who_whom[user.id][product.payed] = (who_whom[user.id][product.payed] || 0) + one_pay
+            whom_who[product.payed][user.id] = (whom_who[product.payed][user.id] || 0) + one_pay
+          }
+        })
+      })
+
+      // Балансировка
+      if (payers.length >= 2) {
+        payers.forEach((payer_id) => {
+          payers.forEach((payer_id2) => {
+            if (payer_id2 !== payer_id) {
+              let from_p_to_p2 = whom_who[payer_id2][payer_id] || 0
+              let from_p2_to_p = whom_who[payer_id][payer_id2] || 0
+              if ((from_p_to_p2 > 0) && (from_p2_to_p > 0)){
+                if (from_p_to_p2 >= from_p2_to_p) {
+                  whom_who[payer_id2][payer_id] = whom_who[payer_id2][payer_id] - from_p2_to_p
+                  whom_who[payer_id][payer_id2] = 0
+
+                  who_whom[payer_id][payer_id2] = who_whom[payer_id][payer_id2] - from_p2_to_p
+                  who_whom[payer_id2][payer_id] = 0
+                }
+              }
+            }
+          })
+        })
+      }
+
+      console.log('Все раскидано примерно за', performance.now() - time, 'мс')
+      console.log(this.$store.state.users.users)
+      console.log(JSON.stringify(this.$store.state.users.users).length)
+      this.$store.commit("updatePayers", payers)
+      this.$store.commit("updateWhomWho", whom_who)
+      this.$store.commit("updateWhoWhom", who_whom)
     }
-  },
-  beforeCreate() {
-    console.log(this.$route.params)
   },
   mounted() {
     if (this.$route.params.storestring) {
-      console.log("Trying to decode from url, decoded:", this.$route.params.storestring)
-      // let storestate = JSON.parse(this.$route.params.storestring)
-      let storestate = JSON.parse(this.$route.params.storestring.fromBase64())
-      console.log("Encoded:", storestate)
-      this.$store.state.users = storestate.users
-      this.$store.state.products = storestate.products
-      this.$store.state.result = storestate.result
       this.fromURL = true
+      this.shareLink = "https://checkdeli.online/results/" + this.$route.params.storestring
+
+      axios.get(BACKEND + APIv1 + "/checks/getbyid/" + this.$route.params.storestring).then(r => {
+        console.log(r.data)
+        this.$store.state.users.users = r.data.users
+        this.$store.state.products.products = r.data.products
+        this.$store.state.products.defaultPayed = r.data.defaultPayed
+
+        this.calculateResults()
+      })
+    }
+
+    if ((this.CDUser.name !== undefined) && (!this.$route.params.storestring)) {
+      this.createCheck()
     }
   }
 }

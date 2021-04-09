@@ -1,5 +1,8 @@
 export default {
     state: {
+        cdid: null,
+        checkTitle: "",
+        checkDate: null,
         products: [],
         defaultPayed: ""
     },
@@ -35,7 +38,16 @@ export default {
             let products = JSON.parse(JSON.stringify(this.state.products)).products
             products.find((product) => {return product.id === props.id}).payed = props.payed
             ctx.commit("updateProducts", products)
-        }
+        },
+        setCDID(ctx, cdid){
+            ctx.commit("updateCDID", cdid)
+        },
+        setTitle(ctx, title){
+            ctx.commit("updateTitle", title)
+        },
+        setDate(ctx, date){
+            ctx.commit("updateDate", date)
+        },
     },
     mutations: {
         addProduct(state, product) {
@@ -46,7 +58,16 @@ export default {
         },
         defaultPayedSet(state, payed) {
             state.defaultPayed = payed
-        }
+        },
+        updateCDID(state, cdid) {
+            state.cdid = cdid
+        },
+        updateTitle(state, title){
+            state.checkTitle = title
+        },
+        updateDate(state, date){
+            state.checkDate = date
+        },
     },
     getters: {
         products(state) {
@@ -57,6 +78,15 @@ export default {
         },
         productById: state => id => {
           return state.products.find((product) => {return product.id === id})
+        },
+        cdid(state) {
+            return state.cdid
+        },
+        checkTitle(state) {
+            return state.checkTitle
+        },
+        checkDate(state) {
+            return state.checkDate
         }
     },
 }

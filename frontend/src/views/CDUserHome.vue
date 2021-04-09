@@ -76,7 +76,7 @@
     </div>
     <div class="cd-user-checks mt-3">
       <div class="cd-card cd-checks-header text-center color-text">Мои чеки</div>
-      <div class="cd-card checks-list">
+      <div class="cd-card checks-list-wrapper">
         <div class="checks-empty text-center" v-if="checks.length === 0">
           <span>
             <i class="material-icons-round color-text">outlined_flag</i>
@@ -100,9 +100,11 @@
                 </button>
               </div>
               <div class="results-check">
-                <button class="shadowed edit-btn">
-                  <i class="material-icons-outlined">visibility</i>
-                </button>
+                <router-link :to="'/results/' + check._id">
+                  <button class="shadowed edit-btn">
+                    <i class="material-icons-outlined">visibility</i>
+                  </button>
+                </router-link>
               </div>
             </div>
           </div>
@@ -123,8 +125,6 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
 import CdAvatar from "@/components/CdAvatar";
-import axios from "axios";
-import {APIv1, BACKEND} from "../../backend.config";
 import CdStepper from "@/components/CdStepper";
 
 export default {
@@ -134,12 +134,26 @@ export default {
     return {
       currentStep: 0,
       checkType: 0,
-      checkTitle: "",
-      checkDate: ""
     }
   },
   computed: {
-    ...mapGetters(["checks", "CDUser"]),
+    ...mapGetters(["checks", "CDUser", "checkTitle", "checkDate"]),
+    checkTitle: {
+      get: function () {
+        return this.$store.state.products.checkTitle
+      },
+      set: function (title) {
+        this.$store.commit('updateTitle', title)
+      }
+    },
+    checkDate: {
+      get: function () {
+        return this.$store.state.products.checkDate
+      },
+      set: function (date) {
+        this.$store.commit('updateDate', date)
+      }
+    },
     titlePlaceholder() {
       return ["Лучшая тусовка в мире", "Ламповая посиделка", "Мощное собрание мощных людей", "Название", "Мега-тусовка",
       "Жесткая тусовка", "Супер-пупер-туса", "Лучше это не вспоминать", "Мама сказала много не пить", "Мамины тусовщики",
@@ -147,10 +161,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchChecks"]),
-    createCheck() {
-      axios.post(BACKEND + APIv1 + "/checks/create", {title: this.checkTitle, date: Date.parse(this.checkDate)})
-    },
+    ...mapActions(["fetchChecks", "setCDID"]),
     nextStep() {
       const showWrong = () => {
         let btn = document.getElementById("next_step_btn")
@@ -166,7 +177,7 @@ export default {
       } else if (this.currentStep === 2) {
         if (this.checkDate) {
           this.currentStep++
-          this.createCheck()
+          this.$router.push("/addusers")
         } else {
           showWrong()
         }
@@ -202,9 +213,10 @@ export default {
   font-weight: 500;
 }
 
-.checks-list{
+.checks-list-wrapper{
   border-radius: 0 0 15px 15px!important;
   max-height: 50vh;
+  overflow-y: scroll;
 }
 
 .checks-empty{

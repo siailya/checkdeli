@@ -32,6 +32,7 @@ export default {
             user.name = vk.session.user.first_name
             user.surname = vk.session.user.last_name
             user.vkid = vk.session.user.id
+            user.id = parseInt(vk.session.user.id)
             user.products = []
             VK.Api.call("users.get",
                 {v: "5.130", user_ids: vk.session.user.id, fields: "photo_200"},
