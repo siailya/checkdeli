@@ -1,5 +1,5 @@
 <template>
-  <div class="add-users">
+  <div class="add-users page">
     <div class="cd-card users-container mt-3">
       <div class="button-wrapper d-flex justify-content-center">
         <button class="active-btn add-user-btn shadowed" @click="() => {addUser(); animateList()}">

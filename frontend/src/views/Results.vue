@@ -45,6 +45,11 @@
       </div>
       <transition-group :name="mode === 0 ? 'change-mode-zero' : 'change-mode-one'" tag="div" class="mt-3">
         <div key="mode0" class="results-container change-mode-item" v-if="mode === 0">
+          <div class="empty-results" v-if="Object.keys(whom_who).length === 0">
+            <i class="material-icons-round color-text">tungsten</i>
+            <br>
+            Никого нет!
+          </div>
           <div class="who-cell-wrapper" v-for="user in users" :key="user.id" @click="showUserMore(user)">
             <div class="cd-card who-cell mt-3 w-100 text-center" v-if="Object.keys(who_whom[user.id]).map((key) => {return [key, who_whom[user.id][key]]}).filter((item) => {return item[1] !== 0 && parseInt(item[0]) !== user.id}).length > 0">
               <span class="user">Пользователь {{userById(user.id).name}} должен</span>
@@ -65,6 +70,11 @@
           </div>
         </div>
         <div key="mode1" class="results-container change-mode-item" v-if="mode === 1">
+          <div class="empty-results" v-if="Object.keys(whom_who).length === 0">
+            <i class="material-icons-round color-text">tungsten</i>
+            <br>
+            Никого нет!
+          </div>
           <div class="whom-cell-wrapper" v-for="payer in payers" :key="payer">
             <div class="cd-card whom-cell mt-3 w-100 text-center" v-if="Object.values(Object.keys(whom_who[payer]).map((key) => {return parseInt(key) !== payer ? whom_who[payer][key] : 0})).reduce((a, b) => a + b, 0)">
               <span class="user">Пользователю {{userById(payer).name}} должны</span>
@@ -85,7 +95,7 @@
 <!--        <span class="beta">BETA</span>-->
 <!--      </button>-->
 <!--    </div>-->
-    <div class="cd-card share mt-3 mb-4">
+    <div class="cd-card share mt-3 mb-4" :class="shareLink === 'Я украл сслыку' && 'share-link-deactivated'">
       <div class="text-center share-header color-text d-flex justify-content-center">
         <div class="text-center">
           Поделись ссылкой
@@ -97,7 +107,7 @@
       </div>
       <div class="share-link d-flex mt-2">
         <input class="input form-control w-100" readonly :value="shareLink"/>
-        <button class="copy-link ml-2 shadowed active-btn" @click="copyLink">
+        <button class="copy-link ml-2 shadowed active-btn" @click="copyLink" :disabled="shareLink !== 'Я украл сслыку'">
           <i class="material-icons mt-auto mb-auto">content_copy</i>
         </button>
       </div>
@@ -119,14 +129,14 @@ export default {
       mode: 0,
       activeUser: {products: []},
       fromURL: false,
-      shareLink: ""
+      shareLink: "Я украл сслыку"
     }
   },
   computed: {
     ...mapGetters(["users", "products", "payers", "who_whom", "whom_who", "userById", "productById", "CDUser", "checkTitle", "checkDate"]),
   },
   methods: {
-    ...mapActions(["setCDID"]),
+    ...mapActions(["setCDID", "calculateResults"]),
     createCheck() {
       axios.post(BACKEND + APIv1 + "/checks/create", {title: this.checkTitle, date: Date.parse(this.checkDate)}).then((r) => {
         if (r.data.status === "Successfully created") {
@@ -163,66 +173,12 @@ export default {
       }
     },
     showUserMore(user) {
-      console.log(user)
       this.activeUser = user
       this.$bvModal.show("user_modal")
     },
     copyLink() {
       navigator.clipboard.writeText("Разделенный чек можно посмотреть тут: \n\n" + this.shareLink)
     },
-    calculateResults() {
-      let who_whom = {}, whom_who = {}, payers = [];
-      let time = performance.now();
-
-      this.users.forEach((user) => {
-        who_whom[user.id] = {}
-      })
-
-      this.products.forEach((product) => {
-        if (payers.indexOf(product.payed) === -1){
-          payers.push(product.payed)
-          whom_who[product.payed] = {}
-        }
-        let one_pay = parseFloat((product.cost / product.users.length).toFixed(2))
-        this.users.forEach((user) => {
-          if (product.users.indexOf(user.id) !== -1) {
-            if(user.products.find((prd) => {return prd.product_id === product.id}) === undefined){
-              user.products.push({product_id: product.id, amount: one_pay})
-            }
-            who_whom[user.id][product.payed] = (who_whom[user.id][product.payed] || 0) + one_pay
-            whom_who[product.payed][user.id] = (whom_who[product.payed][user.id] || 0) + one_pay
-          }
-        })
-      })
-
-      // Балансировка
-      if (payers.length >= 2) {
-        payers.forEach((payer_id) => {
-          payers.forEach((payer_id2) => {
-            if (payer_id2 !== payer_id) {
-              let from_p_to_p2 = whom_who[payer_id2][payer_id] || 0
-              let from_p2_to_p = whom_who[payer_id][payer_id2] || 0
-              if ((from_p_to_p2 > 0) && (from_p2_to_p > 0)){
-                if (from_p_to_p2 >= from_p2_to_p) {
-                  whom_who[payer_id2][payer_id] = whom_who[payer_id2][payer_id] - from_p2_to_p
-                  whom_who[payer_id][payer_id2] = 0
-
-                  who_whom[payer_id][payer_id2] = who_whom[payer_id][payer_id2] - from_p2_to_p
-                  who_whom[payer_id2][payer_id] = 0
-                }
-              }
-            }
-          })
-        })
-      }
-
-      console.log('Все раскидано примерно за', performance.now() - time, 'мс')
-      console.log(this.$store.state.users.users)
-      console.log(JSON.stringify(this.$store.state.users.users).length)
-      this.$store.commit("updatePayers", payers)
-      this.$store.commit("updateWhomWho", whom_who)
-      this.$store.commit("updateWhoWhom", who_whom)
-    }
   },
   mounted() {
     if (this.$route.params.storestring) {
@@ -239,7 +195,7 @@ export default {
       })
     }
 
-    if ((this.CDUser.name !== undefined) && (!this.$route.params.storestring)) {
+    if ((this.CDUser.name !== undefined) && (this.$route.params.storestring === undefined)) {
       this.createCheck()
     }
   }
@@ -334,6 +290,15 @@ html[theme="dark"]{
   .slider{
     background: var(--background-thirdly);
     //box-shadow: 0 0 10px 5px rgba($light_dark, 0.2)!important;
+  }
+}
+
+.empty-results{
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  i{
+    font-size: 72px;
   }
 }
 
@@ -440,6 +405,13 @@ html[theme="glass"] .share{
   font-size: 0.7em;
   text-align: center;
   color: var(--text-secondary);
+}
+
+.share-link-deactivated{
+  opacity: 0.6;
+  input{
+    text-align: center;
+  }
 }
 </style>
 

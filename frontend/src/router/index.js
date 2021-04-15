@@ -7,11 +7,23 @@ Vue.use(VueRouter)
 const routes = [
     {
         path: '/',
-        name: 'Home',
+        name: 'Index',
         component: Home,
         meta: {
             title: null
         },
+    },
+    {
+      path: "*",
+      redirect: "/404"
+    },
+    {
+        path: "/404",
+        name: "NotFound",
+        component: () => import("../views/NotFound"),
+        meta: {
+            title: "Ничего не нашлось"
+        }
     },
     {
         path: '/addusers',
@@ -37,14 +49,14 @@ const routes = [
             title: "Чекдели - результаты"
         }
     },
-    {
-        path: "/intro",
-        name: "Intro",
-        component: () => import("../views/Intro"),
-        meta: {
-            title: "Чекдели - что это?"
-        }
-    },
+    // {
+    //     path: "/intro",
+    //     name: "Intro",
+    //     component: () => import("../views/Intro"),
+    //     meta: {
+    //         title: "Чекдели - что это?"
+    //     }
+    // },
     {
         path: "/home",
         name: "Home",

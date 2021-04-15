@@ -142,8 +142,6 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex";
-// eslint-disable-next-line no-unused-vars
-import jwt from "jsonwebtoken";
 import CdAvatar from "@/components/CdAvatar";
 
 
@@ -185,7 +183,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["addProduct", "deleteProduct", "addUserToProduct", "setProductPayed"]),
+    ...mapActions(["addProduct", "deleteProduct", "addUserToProduct", "setProductPayed", "calculateResults"]),
     toggleOtherContent(index) {
       if (this.users.length > 0) {
         let itemIndex = this.openedCells.indexOf(index)
@@ -277,9 +275,6 @@ export default {
       } else{
         this.calculateResults()
         this.$router.push("/results")
-        // location.hash = jwt.sign({
-        //   data: JSON.stringify(this.$store.state)
-        // }, 'ispolzuyuJWTdlyaheshirovaniyastate')
       }
     },
     setSnackbar(text) {
@@ -331,59 +326,6 @@ export default {
       clearInterval(this.snackbar_show)
       this.snackbar_show = false
     },
-    calculateResults() {
-      let who_whom = {}, whom_who = {}, payers = [];
-      let time = performance.now();
-
-      this.users.forEach((user) => {
-        who_whom[user.id] = {}
-      })
-
-      this.products.forEach((product) => {
-        if (payers.indexOf(product.payed) === -1){
-          payers.push(product.payed)
-          whom_who[product.payed] = {}
-        }
-        let one_pay = parseFloat((product.cost / product.users.length).toFixed(2))
-        this.users.forEach((user) => {
-          if (product.users.indexOf(user.id) !== -1) {
-            if(user.products.find((prd) => {return prd.product_id === product.id}) === undefined){
-              user.products.push({product_id: product.id, amount: one_pay})
-            }
-            who_whom[user.id][product.payed] = (who_whom[user.id][product.payed] || 0) + one_pay
-            whom_who[product.payed][user.id] = (whom_who[product.payed][user.id] || 0) + one_pay
-          }
-        })
-      })
-
-      // Балансировка
-      if (payers.length >= 2) {
-        payers.forEach((payer_id) => {
-          payers.forEach((payer_id2) => {
-            if (payer_id2 !== payer_id) {
-              let from_p_to_p2 = whom_who[payer_id2][payer_id] || 0
-              let from_p2_to_p = whom_who[payer_id][payer_id2] || 0
-              if ((from_p_to_p2 > 0) && (from_p2_to_p > 0)){
-                if (from_p_to_p2 >= from_p2_to_p) {
-                  whom_who[payer_id2][payer_id] = whom_who[payer_id2][payer_id] - from_p2_to_p
-                  whom_who[payer_id][payer_id2] = 0
-
-                  who_whom[payer_id][payer_id2] = who_whom[payer_id][payer_id2] - from_p2_to_p
-                  who_whom[payer_id2][payer_id] = 0
-                }
-              }
-            }
-          })
-        })
-      }
-
-      console.log('Все раскидано примерно за', performance.now() - time, 'мс')
-      console.log(this.$store.state.users.users)
-      console.log(JSON.stringify(this.$store.state.users.users).length)
-      this.$store.commit("updatePayers", payers)
-      this.$store.commit("updateWhomWho", whom_who)
-      this.$store.commit("updateWhoWhom", who_whom)
-    }
   },
   beforeMount() {
     if (this.users.length === 0) {

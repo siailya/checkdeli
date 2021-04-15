@@ -69,7 +69,7 @@
       </div>
     </b-modal>
     <div class="cd-card cd-user-profile text-center mt-3">
-      <span class="cd-user-hello color-text">Привет, {{CDUser.name}}!</span>
+      <span class="cd-user-hello color-text">Привет, {{CDUser.name || "Никто"}}!</span>
       <cd-avatar :user="CDUser" class="ml-auto mr-auto mt-2 mb-2"/>
       Разделено уже {{checks.length}} чеков!
       <button class="w-100 mt-3 d-flex justify-content-center share-btn color-text shadowed active-btn"><i class="material-icons mt-auto mb-auto mr-1">share</i>Поделиться</button>
@@ -109,8 +109,8 @@
             </div>
           </div>
         </div>
-        <button v-b-modal.create_check_modal class="active-btn add-check-btn d-flex w-100 justify-content-center mt-2 color-text shadowed">
-          <i class="material-icons color-text mt-auto mb-auto mr-1">add_circle_outline</i> Добавить!
+        <button v-b-modal.create_check_modal class="active-btn add-check-btn d-flex w-100 justify-content-center mt-2 color-text shadowed" v-if="CDUser.name">
+          <i class="material-icons color-text mt-auto mb-auto mr-1">add_circle_outline</i> Новый чек
         </button>
       </div>
     </div>
@@ -216,7 +216,7 @@ export default {
 .checks-list-wrapper{
   border-radius: 0 0 15px 15px!important;
   max-height: 50vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .checks-empty{

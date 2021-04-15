@@ -568,17 +568,17 @@ html[theme="dark"]{
   text-align: left;
 }
 
-.step-counter::after{
-  content: "";
-  width: 3px;
-  height: 130px;
-  background-color: var(--main);
-  display: block;
-  color: white;
-  z-index: -1;
-  position: absolute;
-  margin-top: 170px;
-}
+//.step-counter::after{
+//  content: "";
+//  width: 3px;
+//  height: 130px;
+//  background-color: var(--main);
+//  display: block;
+//  color: white;
+//  z-index: -1;
+//  position: absolute;
+//  margin-top: 170px;
+//}
 
 .fourth-step{
   .step-counter::after{
