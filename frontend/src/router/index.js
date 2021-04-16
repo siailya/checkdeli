@@ -49,14 +49,14 @@ const routes = [
             title: "Чекдели - результаты"
         }
     },
-    // {
-    //     path: "/intro",
-    //     name: "Intro",
-    //     component: () => import("../views/Intro"),
-    //     meta: {
-    //         title: "Чекдели - что это?"
-    //     }
-    // },
+    {
+        path: "/vk",
+        name: "VKLogin",
+        component: () => import("../views/VKLogin"),
+        meta: {
+            title: "Логинимся через ВК"
+        }
+    },
     {
         path: "/home",
         name: "Home",
@@ -72,7 +72,7 @@ const router = new VueRouter({
     routes
 })
 
-const DEFAULT_TITLE = 'Чекдели - разделить чек с друзьями';
+const DEFAULT_TITLE = 'Чекдели - разделить чек с друзьями!';
 router.afterEach((to) => {
     Vue.nextTick(() => {
         document.title = to.meta.title || DEFAULT_TITLE;

@@ -31,6 +31,9 @@
         <div class="results-subheader">
           Ну наконец-то!
         </div>
+        <div class="check-info mt-1" v-if="checkTitle && CDUser.name">
+          Чек "{{checkTitle}}", который создал {{CDUser.name}} {{new Date(checkDate).toLocaleDateString("ru")}}
+        </div>
       </div>
     </div>
     <div class="cd-card results-wrapper mb-3">
@@ -45,13 +48,13 @@
       </div>
       <transition-group :name="mode === 0 ? 'change-mode-zero' : 'change-mode-one'" tag="div" class="mt-3">
         <div key="mode0" class="results-container change-mode-item" v-if="mode === 0">
-          <div class="empty-results" v-if="Object.keys(whom_who).length === 0">
+          <div class="empty-results" v-if="users.length > 1 && Object.keys(whom_who).length === 0">
             <i class="material-icons-round color-text">tungsten</i>
             <br>
             Никого нет!
           </div>
           <div class="who-cell-wrapper" v-for="user in users" :key="user.id" @click="showUserMore(user)">
-            <div class="cd-card who-cell mt-3 w-100 text-center" v-if="Object.keys(who_whom[user.id]).map((key) => {return [key, who_whom[user.id][key]]}).filter((item) => {return item[1] !== 0 && parseInt(item[0]) !== user.id}).length > 0">
+            <div class="cd-card who-cell mt-3 w-100 text-center" v-if="users.length > 1 && Object.keys(who_whom[user.id]).map((key) => {return [key, who_whom[user.id][key]]}).filter((item) => {return item[1] !== 0 && parseInt(item[0]) !== user.id}).length > 0">
               <span class="user">Пользователь {{userById(user.id).name}} должен</span>
               <div class="who-whom-cell-wrapper" v-for="(amount, who, index) in who_whom[user.id]" :key="index">
                 <div class="who-whom-cell text-left" v-if="(parseInt(who) !== user.id) && (amount > 0)">
@@ -95,7 +98,7 @@
 <!--        <span class="beta">BETA</span>-->
 <!--      </button>-->
 <!--    </div>-->
-    <div class="cd-card share mt-3 mb-4" :class="shareLink === 'Я украл сслыку' && 'share-link-deactivated'">
+    <div class="cd-card share mt-3" :class="shareLink === 'Я украл ссылку!' && 'share-link-deactivated'">
       <div class="text-center share-header color-text d-flex justify-content-center">
         <div class="text-center">
           Поделись ссылкой
@@ -107,10 +110,18 @@
       </div>
       <div class="share-link d-flex mt-2">
         <input class="input form-control w-100" readonly :value="shareLink"/>
-        <button class="copy-link ml-2 shadowed active-btn" @click="copyLink" :disabled="shareLink !== 'Я украл сслыку'">
+        <button class="copy-link ml-2 shadowed active-btn" @click="copyLink" :disabled="shareLink === 'Я украл сслыку'">
           <i class="material-icons mt-auto mb-auto">content_copy</i>
         </button>
       </div>
+    </div>
+
+    <div class="cd-card go-home mt-3 mb-4">
+      <router-link to="/home">
+        <button class="to-home-btn shadowed w-100">
+          Вернуться домой
+        </button>
+      </router-link>
     </div>
   </div>
 </template>
@@ -129,25 +140,20 @@ export default {
       mode: 0,
       activeUser: {products: []},
       fromURL: false,
-      shareLink: "Я украл сслыку"
     }
   },
   computed: {
-    ...mapGetters(["users", "products", "payers", "who_whom", "whom_who", "userById", "productById", "CDUser", "checkTitle", "checkDate"]),
+    ...mapGetters(["users", "products", "payers", "who_whom", "whom_who", "userById", "productById", "CDUser", "checkTitle", "checkDate", "cdid", "checkCreated"]),
+    shareLink: function () {
+      if (this.cdid === null) {
+        return "Я украл ссылку!"
+      } else {
+        return "https://checkdeli.online/results/" + this.cdid
+      }
+    }
   },
   methods: {
-    ...mapActions(["setCDID", "calculateResults"]),
-    createCheck() {
-      axios.post(BACKEND + APIv1 + "/checks/create", {title: this.checkTitle, date: Date.parse(this.checkDate)}).then((r) => {
-        if (r.data.status === "Successfully created") {
-          this.setCDID(r.data.cdid)
-
-          axios.post(BACKEND + APIv1 + "/checks/update", {cd: this.$store.state.products, cu: this.$store.state.users.users}).then((r) => {
-            this.shareLink = "https://checkdeli.online/results/" + r.data.cdid
-          })
-        }
-      })
-    },
+    ...mapActions(["setCDID", "calculateResults", "createNewCheck", "updateCheck"]),
     toggleMode(mode) {
       function activate(id) {
         let btn = document.getElementById(id)
@@ -183,20 +189,28 @@ export default {
   mounted() {
     if (this.$route.params.storestring) {
       this.fromURL = true
-      this.shareLink = "https://checkdeli.online/results/" + this.$route.params.storestring
+      this.$store.commit("updateCDID", this.$route.params.storestring)
 
       axios.get(BACKEND + APIv1 + "/checks/getbyid/" + this.$route.params.storestring).then(r => {
-        console.log(r.data)
+
         this.$store.state.users.users = r.data.users
         this.$store.state.products.products = r.data.products
         this.$store.state.products.defaultPayed = r.data.defaultPayed
+        this.$store.state.products.checkTitle = r.data.title
+        this.$store.state.products.checkDate = r.data.date
+        this.$store.state.products.checkCreated = r.data.user.name
+
 
         this.calculateResults()
       })
     }
 
     if ((this.CDUser.name !== undefined) && (this.$route.params.storestring === undefined)) {
-      this.createCheck()
+      if (this.cdid === null && this.checkTitle !== "") {
+        this.createNewCheck()
+      } else {
+        this.updateCheck()
+      }
     }
   }
 }
@@ -221,7 +235,10 @@ export default {
   .content{
     background: rgba(255, 255, 255, 0.7);
     padding: 15px 10px;
-    color: var(--main)
+    color: var(--main);
+    .check-info{
+      font-size: 16px;
+    }
   }
 }
 
@@ -412,6 +429,17 @@ html[theme="glass"] .share{
   input{
     text-align: center;
   }
+}
+
+.to-home-btn{
+  color: white;
+  border: none;
+  outline: none;
+  background-color: var(--main);
+  border-radius: 50px;
+  padding: 8px 6px;
+  font-size: 16.5px;
+  font-weight: 500;
 }
 </style>
 

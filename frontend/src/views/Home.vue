@@ -8,17 +8,34 @@
         <div class="login-with text-center">
           Войти через
         </div>
-        <div class="login-with-list d-flex justify-content-center">
-          <img width="42" height="42" @click="() => loginVK([$bvModal, $router])" src="@/assets/logo_vk_color_28.svg" alt="VK">
+        <a href="https://oauth.vk.com/authorize?client_id=7803894&display=popup&redirect_uri=http://localhost:3000/vk&scope=friends&response_type=code&v=5.130">
+          <div class="login-with-list d-flex justify-content-center">
+            <img width="42" height="42" src="@/assets/logo_vk_color_28.svg" alt="VK">
+          </div>
+        </a>
+        <div class="or-login text-center mt-1 mb-1">
+          - или -
         </div>
-<!--        <div class="or-login text-center mt-1 mb-1">-->
-<!--          - или - -->
-<!--        </div>-->
-<!--        <div class="login-password">-->
-<!--          <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email" @input="checkAccount">-->
-<!--          <input type="password" class="form-control" placeholder="Пароль" v-model="password">-->
-<!--          <div class="account-info" v-if="email"></div>-->
-<!--        </div>-->
+        <div class="login-password">
+          <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email" @input="checkAccount">
+          <input type="password" class="form-control" placeholder="Пароль" v-model="password">
+          <div class="cd-card password-hints" v-if="password && !accountInBase">
+            Минимум 6 знаков - <i class="material-icons-round" :style="this.passwordVerify[0] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[0] ? 'done' : 'close'}}</i><br>
+            Хотя бы одна заглавная буква - <i class="material-icons-round" :style="this.passwordVerify[1] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[1] ? 'done' : 'close'}}</i><br>
+            Хотя бы одна цифра - <i class="material-icons-round" :style="this.passwordVerify[2] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[2] ? 'done' : 'close'}}</i>
+          </div>
+          <transition name="slide-up">
+            <div class="account-info" v-if="emailVerify && email.includes('@')">
+              <div class="login text-center mt-2" v-if="emailVerify && accountInBase">
+                <button @click="loginNative" class="login-btn mt-1 w-100" :class="wrongPassword ? 'wrong-login' : ''">{{wrongPassword ? "Неверный пароль!" : "Войти"}}</button>
+              </div>
+              <div class="register text-center" v-if="emailVerify && !accountInBase">
+                <input type="text" class="form-control mt-1 mb-2" placeholder="Имя" v-model="name">
+                <button @click="registerNative" class="register-btn mt-1 w-100" :class="registerError ? 'wrong-login' : ''">{{registerError ? "Заполни все поля!" : "Создать аккаунт"}}</button>
+              </div>
+            </div>
+          </transition>
+        </div>
         <div class="or-login text-center mt-1 mb-1">
           - или -
         </div>
@@ -27,6 +44,7 @@
         </div>
       </div>
     </b-modal>
+
     <b-modal id="confirm_without_login" content-class="cd-card" centered hide-header hide-footer>
       <div class="login-header text-center">
         Точно не познакомимся?
@@ -43,6 +61,7 @@
         </button>
       </div>
     </b-modal>
+
     <header class="page home">
       <div class="theme-changer cd-card">
         <button class="change-theme d-flex" @click="changeTheme">
@@ -53,7 +72,7 @@
         <router-link to="/home" v-if="CDUser.name !== undefined">
           <div class="cduser cd-card d-flex align-items-center">
               <div class="cdu-avatar">
-                <img :src="CDUser.avatar" alt="">
+                <img :src="CDUser.avatar || 'https://icotar.com/initials/~?fg=ffffff&bg=' + mainColor" alt="">
               </div>
               <div class="cdu-name">
                 {{CDUser.name}}
@@ -75,11 +94,6 @@
             <span class="color-text">Начать!</span>
           </button>
         </div>
-<!--        <div class="cd-card ml-1">-->
-<!--          <button @click="$router.push('/intro')" class="about active-btn">-->
-<!--            <span class="color-text">?</span>-->
-<!--          </button>-->
-<!--        </div>-->
       </div>
     </header>
 
@@ -241,7 +255,7 @@
       </div>
       <div class="cd-info">
         <a href="https://vk.com/overcreated" class="madeby align-items-center">Сделано {{["overcreated", "siailya"][Math.floor(Math.random() * 2)]}} c <i class="material-icons" style="color: var(--wrong); font-size: 15px">favorite</i></a>
-        <div class="ver">v1.1.0a</div>
+        <div class="ver">v1.2.0a</div>
       </div>
     </footer>
   </div>
@@ -250,6 +264,10 @@
 <script>
 import {mapActions} from "vuex";
 import {mapGetters} from "vuex";
+import axios from "axios";
+import {APIv1, BACKEND} from "../../backend.config";
+import debounce from "debounce";
+import jwt from "jsonwebtoken";
 
 export default {
   name: 'Home',
@@ -258,7 +276,11 @@ export default {
       theme: 1,
       themePic: "dark_mode",
       email: "",
-      password: ""
+      password: "",
+      name: "",
+      accountInBase: true,
+      wrongPassword: false,
+      registerError: false
     }
   },
   computed: {
@@ -269,6 +291,23 @@ export default {
       } else {
         return "science"
       }
+    },
+    mainColor() {
+      return window.getComputedStyle(document.documentElement).getPropertyValue('--main').replace("#", "").replace(" ", "")
+    },
+    emailVerify: function () {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(this.email).toLowerCase())
+    },
+    passwordVerify: function () {
+      let len = false
+      let upperCase = false
+      let digits = false
+      if (this.password.length > 6) len = true
+      if (/[A-ZА-Я]+/.test(this.password)) upperCase = true
+      if (/\d+/.test(this.password)) digits = true
+
+      return [len, upperCase, digits]
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -276,7 +315,7 @@ export default {
     next()
   },
   methods: {
-    ...mapActions(["loginVK"]),
+    ...mapActions(["fetchChecks"]),
     changeTheme() {
       if (this.theme % 2 === 0){
         document.documentElement.setAttribute("theme", "dark")
@@ -285,17 +324,23 @@ export default {
         document.documentElement.setAttribute("theme", "light")
         this.themePic = "light_mode"
       }
-      // else if (this.theme % 3 === 2){
-      //   document.documentElement.setAttribute("theme", "glass")
-      //   this.themePic = "science"
-      // }
       this.theme += 1
     },
-    checkAccount() {
-      console.log(this.email)
-    },
+    checkAccount: debounce(function () {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if (re.test(String(this.email).toLowerCase())) {
+        axios.post(BACKEND + APIv1 + "/checkaccount", {email: this.email}).then(r => {
+          if (r.data === 0) {
+            this.accountInBase = false
+          } else {
+            this.accountInBase = true
+          }
+        })
+      }
+    }, 1000, true),
     start() {
-      if (this.CDUser.uid) {
+      if (this.CDUser._id) {
         this.$router.push("/home")
       } else {
         this.$bvModal.show("login_modal")
@@ -304,6 +349,35 @@ export default {
     listenScroll () {
       let back = document.getElementById("back-wave")
       back.style.transform = `translateY(${window.pageYOffset / 15}px)`
+    },
+    loginNative () {
+      axios.post(BACKEND + APIv1 + "/login/native", {type: "native", name: this.name, email: this.email, password: this.password}).then(r => {
+        console.log(r.data)
+        console.log(jwt.decode(r.data.token))
+        if (r.data.status === "User login successful!") {
+          this.$store.commit("updateCDUser", jwt.decode(r.data.token).user)
+          this.$router.push("/home")
+          this.fetchChecks()
+        } else {
+          this.wrongPassword = true
+          setTimeout(() => {
+            this.wrongPassword = false
+          }, 5000)
+        }
+      })
+    },
+    registerNative () {
+      if (this.email && this.password && this.name && this.passwordVerify.every(e => e === true)) {
+        axios.post(BACKEND + APIv1 + "/register/native", {type: "native", name: this.name, email: this.email, password: this.password}).then(r => {
+          this.$store.commit("updateCDUser", jwt.decode(r.data.token).user)
+          this.$router.push("/home")
+        })
+      } else {
+        this.registerError = true
+        setTimeout(() => {
+          this.registerError = false
+        }, 5000)
+      }
     }
   },
   mounted() {
@@ -655,5 +729,32 @@ html[theme="dark"]{
 .decline-no-login{
   background-color: var(--main);
   color: white;
+}
+
+.password-hints{
+  font-size: 12px;
+  i{
+    font-size: 15px;
+  }
+}
+
+.login-btn, .register-btn{
+  background: var(--main);
+  color: white;
+  padding: 8px 6px;
+  border-radius: 50px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all .3s;
+}
+
+.wrong-login{
+  background: var(--wrong);
+}
+
+.wrong-login:active{
+  animation: wrong .5s infinite;
 }
 </style>

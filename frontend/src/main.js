@@ -13,12 +13,15 @@ import 'vue-select/dist/vue-select.css';
 
 import VueCookie from 'vue-cookie';
 import VueTilt from 'vue-tilt.js'
+import axios from "axios";
 
 Vue.config.productionTip = false
+axios.defaults.withCredentials = true
+
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
 Vue.use(VueCookie);
-Vue.use(VueTilt)
+Vue.use(VueTilt);
 
 Vue.component('v-select', vSelect)
 new Vue({

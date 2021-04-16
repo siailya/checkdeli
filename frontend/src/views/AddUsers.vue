@@ -166,6 +166,9 @@ export default {
         this.setDefaultPayed(parseInt(this.users[0].id))
       }
     }
+  },
+  mounted() {
+    this.animateList()
   }
 }
 </script>

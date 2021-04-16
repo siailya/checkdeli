@@ -47,7 +47,6 @@
 
 <script>
 import {mapActions} from "vuex";
-import VK from "vk-openapi";
 
 export default {
   name: "App",
@@ -58,7 +57,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["restoreVK"]),
+    ...mapActions(["restoreAuth"]),
     acceptCookies() {
       window.localStorage.setItem("cookies", "true")
       this.cookies = "true"
@@ -71,16 +70,10 @@ export default {
       this.transitionName = toDepth < fromDepth ? 'slide-right' : toDepth === fromDepth ? 'fade' : 'slide-right'
     }
   },
-  created() {
-    VK.init({
-      apiId: 7803894
-    })
-
-    VK.Auth.getLoginStatus((e) => {
-      if (e.status === "connected") {
-        this.restoreVK(e)
-      }
-    }, true)
+  mounted() {
+    if (document.cookie.includes("auth=vk") || document.cookie.includes("auth=native")) {
+      this.restoreAuth()
+    }
   }
 }
 </script>

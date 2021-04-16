@@ -1,8 +1,14 @@
+// eslint-disable-next-line no-unused-vars
+import axios from "axios";
+// eslint-disable-next-line no-unused-vars
+import {APIv1, BACKEND} from "../../../backend.config";
+
 export default {
     state: {
         cdid: null,
         checkTitle: "",
         checkDate: null,
+        checkCreated: "",
         products: [],
         defaultPayed: ""
     },
@@ -48,6 +54,16 @@ export default {
         setDate(ctx, date){
             ctx.commit("updateDate", date)
         },
+        createNewCheck(ctx){
+            axios.post(BACKEND + APIv1 + "/checks/create", {title: this.state.products.checkTitle, date: Date.parse(this.state.products.checkDate), defaultPayed: this.state.products.defaultPayed, products: this.state.products.products, users: this.state.users.users}).then((r) => {
+                if (r.data.status === "Successfully created") {
+                    ctx.commit("updateCDID", r.data.cdid)
+                }
+            })
+        },
+        async updateCheck(){
+            await axios.post(BACKEND + APIv1 + "/checks/update", {cd: this.state.products, users: this.state.users.users})
+        }
     },
     mutations: {
         addProduct(state, product) {
@@ -87,6 +103,9 @@ export default {
         },
         checkDate(state) {
             return state.checkDate
+        },
+        checkCreated(state) {
+            return state.checkCreated
         }
     },
 }
