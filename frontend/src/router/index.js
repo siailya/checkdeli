@@ -1,21 +1,28 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
     {
+        path: "*",
+        redirect: "/404"
+    },
+    {
         path: '/',
         name: 'Index',
-        component: Home,
+        component: () => import("../views/Home"),
         meta: {
             title: null
         },
     },
     {
-      path: "*",
-      redirect: "/404"
+        path: "/home",
+        name: "Home",
+        component: () => import("../views/CDUserHome"),
+        meta: {
+            title: "Чекдели - профиль"
+        }
     },
     {
         path: "/404",
@@ -50,19 +57,35 @@ const routes = [
         }
     },
     {
+        path: "/register",
+        name: "Registration",
+        component: () => import("../views/Registration"),
+        meta: {
+            title: "Чекдели - регистрация"
+        }
+    },
+    {
         path: "/vk",
         name: "VKLogin",
-        component: () => import("../views/VKLogin"),
+        component: () => import("../views/WithLogin"),
         meta: {
             title: "Логинимся через ВК"
         }
     },
     {
-        path: "/home",
-        name: "Home",
-        component: () => import("../views/CDUserHome"),
+        path: "/ya",
+        name: "YaLogin",
+        component: () => import("../views/WithLogin"),
         meta: {
-            title: "Чекдели - профиль"
+            title: "Логинимся через Яндекс"
+        }
+    },
+    {
+        path: "/gl",
+        name: "GoogleLogin",
+        component: () => import("../views/WithLogin"),
+        meta: {
+            title: "Логинимся через Google"
         }
     }
 ]

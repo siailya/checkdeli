@@ -26,16 +26,16 @@
       </div>
     </b-modal>
     <div class="calculating">
-      <div class="cd-card products-header mt-3">
-        <div class="button-wrapper d-flex justify-content-center">
-          <button class="active-btn add-product-btn shadowed" @click="addProduct">
+<!--      <div class="">-->
+        <div class="cd-card products-header mt-3 button-wrapper d-flex justify-content-center">
+          <button class="active-btn add-product-btn shadowed" :class="onboarding === 0 ? 'add-btn-onb' : ''" @click="() => {addProduct(); onboardingNext()}">
             <span class="color-text d-flex align-items-center"><i class="material-icons mr-2">add_circle_outline</i>Добавить позицию</span>
           </button>
           <button class="active-btn settings-products-btn ml-3 d-flex align-items-center shadowed" @click="setSnackbar('Настройки я еще не изобрел :(')">
             <i class="color-text material-icons">settings</i>
           </button>
         </div>
-      </div>
+<!--      </div>-->
       <div class="cd-card products-wrapper" ref="products_wrapper">
         <transition name="fade">
           <div v-if="products.length <= 0" class="empty-products text-center">
@@ -56,7 +56,7 @@
             <div class="d-flex w-100 main-content" :id="'main_content_' + index">
               <input class="form-control" maxlength="30" :ref="'title_' + product.id" placeholder="Название" v-model="product.title"/>
               <input type="number" class="form-control ml-1" :ref="'cost_' + product.id" @input="e => {editInput(e, index)}" placeholder="Цена" v-model="product.cost">
-              <div class="other-toggle mt-auto mb-auto" @click="() => {toggleOtherContent(index)}">
+              <div class="other-toggle mt-auto mb-auto" :class="index === 0 && onboarding === 1 ? 'toggle-btn-onb' : ''" @click="() => {toggleOtherContent(index); onboardingNext()}">
                 <i class="material-icons ml-2 other-expand"
                    :class="openedCells.indexOf(index) !== -1 ? 'other-less' : 'other-more'">expand_more</i>
               </div>
@@ -65,30 +65,39 @@
               <div class="other-content" :id="'other_content_' + index" v-if="openedCells.indexOf(index) !== -1">
                 <div class="delete-product mb-2 d-flex">
                   <button class="payed-product-btn w-100 shadowed" v-b-modal.change_payed
-                          @click="selectedProduct = product">
+                          @click="() => {selectedProduct = product; onboardingNext()}"
+                          :class="index === 0 && onboarding === 2 ? 'payed-btn-onb' : ''"
+                  >
                     <span class="color-text d-flex justify-content-center align-items-center">
                       <i class="material-icons mr-1">account_balance_wallet</i>
                       {{
+                        (users.filter((user) => {
+                          return user.id === product.payed
+                        })[0]) ?
                         users.filter((user) => {
                           return user.id === product.payed
-                        })[0].name
+                        })[0].name :
+                        "Укажи кто оплатил!"
                       }}
                     </span>
                   </button>
-                  <button class="copy-product-btn w-25 mr-1 ml-1 shadowed" @click="copyProduct(index)">
+                  <button class="copy-product-btn w-25 mr-1 ml-1 shadowed" @click="() => {copyProduct(index); onboardingNext()}"
+                          :class="index === 0 && onboarding === 3 ? 'copy-btn-onb' : ''">
                     <span class="color-text d-flex justify-content-center align-items-center">
                       <i class="material-icons">content_copy</i>
                     </span>
                   </button>
-                  <button class="delete-product-btn w-50 shadowed" @click="() => deleteProductItem(index)">
+                  <button class="delete-product-btn w-50 shadowed"
+                          :class="index === 0 && onboarding === 4 ? 'del-btn-onb' : ''" @click="() => {deleteProductItem(index); onboardingNext()}">
                     <span class="d-flex justify-content-center align-items-center">
                       <i class="material-icons mr-1">delete_outline</i>
                       Удалить
                     </span>
                   </button>
                 </div>
-                <div class="product-users d-flex">
-                  <div class="bordered all-product-users text-center" @click="toggleAllUsers(product, index)">
+                <div class="product-users d-flex" :style="index === 0 && onboarding === 5 ? 'overflow: visible' : ''">
+                  <div class="bordered all-product-users text-center"
+                       :class="index === 0 && onboarding === 5 ? 'users-onb' : ''" @click="() => {toggleAllUsers(product, index); onboardingNext()}">
                     <cd-avatar key="initials" class="m-auto" all-users :checked="allUsersChecked(product)" :src="'https://icotar.com/initials/' + ('∞') + '?fg=' + mainColor + '&bg=ffffff'" alt=""/>
                     Все
                   </div>
@@ -137,6 +146,16 @@
         </transition>
       </div>
     </transition>
+    <transition name="slide-up" appear>
+      <div class="adaptive-width onboarding cd-card text-center" v-if="onboarding < 7">
+        <div class="onb-header">
+          Обучалочка
+        </div>
+        {{onboarding_text[onboarding] || ""}}
+        <br>
+        <button class="onb-next-btn mt-2" @click="onboardingNext(true)">Дальше</button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -156,7 +175,16 @@ export default {
       selectedProduct: {},
       snackbar_show: false,
       snackbar_text: "",
-      tooltips: {add_prd: true, expand: false, check_user: false, change_payer: false}
+      onboarding: 1000,
+      onboarding_text: [
+          "Для начала давай добавим что-нибудь!",
+          "Заглянем в свойства продукта",
+          "Тут можно выбрать того, кто оплатил позицию. У каждой позиции может быть свой плательщик",
+          "Можно и скопировать позицию со всеми параметрами",
+          "И удалить можно, естественно",
+          "В каждой позиции необходимо выбрать тех, кто за нее должен платить - то есть всех, кто ее использовал",
+          "На этом все, надеюсь, все получится! Успехов!"
+      ]
     }
   },
   computed: {
@@ -184,7 +212,27 @@ export default {
   },
   methods: {
     ...mapActions(["addProduct", "deleteProduct", "addUserToProduct", "setProductPayed", "calculateResults"]),
+    onboardingNext(for_next=false) {
+      if (this.onboarding === 0) {
+        if (for_next) {
+          this.addProduct()
+        }
+      } else if (this.onboarding === 1) {
+        if (for_next) {
+          this.toggleOtherContent(0)
+        }
+      } else if (this.onboarding === 8) {
+        localStorage.setItem("calc-onb", "true")
+      }
+
+      let old = this.onboarding
+      this.onboarding = 1000
+      setTimeout(() => {
+        this.onboarding = old + 1
+      }, 600)
+    },
     toggleOtherContent(index) {
+      // console.log(index)
       if (this.users.length > 0) {
         let itemIndex = this.openedCells.indexOf(index)
         if (itemIndex === -1) {
@@ -237,7 +285,13 @@ export default {
         }, 2500)
       }
 
+      let userids = this.users.map((u) => {return u.id})
+      let no_payed = []
+
       this.products.forEach((item, index) => {
+        if (userids.indexOf(item.payed) === -1) {
+          no_payed.push(index)
+        }
         if (item.users.length === 0) {
           if (this.openedCells.indexOf(index) === -1) {
             this.toggleOtherContent(index)
@@ -272,7 +326,12 @@ export default {
         showWrong("Бесплатно??")
       } else if (this.products.map((item) => {return item.users.length}).some((item) => {return item === 0})) {
         showWrong("Отметь пользователей во всех продуктах!")
-      } else{
+      } else if (no_payed.length > 0) {
+        no_payed.forEach((product_index) => {
+          this.toggleOtherContent(product_index)
+        })
+        showWrong("Укажи кто оплатил продукты!")
+      } else {
         this.calculateResults()
         this.$router.push("/results")
       }
@@ -336,6 +395,14 @@ export default {
     window.onbeforeunload = () => {
       return  "Стой! Введенные данные не сохранятся при перезагрузке!"
     }
+
+    if (localStorage.getItem("calc-onb") !== "true") {
+      this.onboarding = 0
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    window.onbeforeunload = null
+    next()
   }
 }
 </script>
@@ -344,37 +411,10 @@ export default {
 @use "sass:color";
 @import "public/colors";
 
-.snackbar {
-  position: fixed;
-  margin-left: 0!important;
-  bottom: 2vh;
-  border-radius: 15px;
-}
 
-@media screen and (max-width: 768px){
-  .snackbar {
-    width: 90%!important;
-    margin-left: 5%!important;
-  }
-}
 
-html[theme="glass"]{
-  .snackbar{
-    background: rgba($main, 0.75)!important;
-  }
-}
 
-html[theme="light"]{
-  .snackbar{
-    background: rgba($light_main, 0.75)!important;
-  }
-}
 
-html[theme="dark"]{
-  .snackbar{
-    background: rgba($dark_main, 0.75)!important;
-  }
-}
 
 .calculating {
   padding: 0 16px;
@@ -383,14 +423,17 @@ html[theme="dark"]{
 .products-header {
   border-radius: 15px 15px 0 0!important;
   box-shadow: 0 0 0 0 rgba(31, 38, 135, 0.1);
-  overflow: hidden;
-  padding: 0!important;
+  //overflow: hidden;
+  //padding: 0!important;
   border-bottom: none;
+  position: relative;
+  z-index: 1000;
 }
 
 .button-wrapper {
   background: rgba(255, 255, 255, 0.5);
   padding: 15px 10px;
+  z-index: 1000;
 
   button {
     span {
@@ -459,7 +502,7 @@ html[theme="light"] {
 .product-cell {
   transition: all .3s;
   padding: 8px;
-  overflow: hidden;
+  //overflow: hidden;
   border-radius: 10px;
 
   input {
@@ -523,15 +566,17 @@ html[theme="dark"] .other-content {
   }
 }
 
-.payed-product-btn {
-  background: white;
+.payed-product-btn, .copy-product-btn {
+  background: white!important;
 }
 
 html[theme="dark"] {
   .payed-product-btn, .copy-product-btn{
-    background: var(--background-secondary);
+    background: var(--background-secondary)!important;
   }
 }
+
+
 
 .product-users {
   width: auto;
@@ -614,6 +659,29 @@ html[theme="light"]{
 
 .next-btn.shadowed{
   box-shadow: 0 5px 10px 2px rgba(50, 50, 50, 0.15);
+}
+
+.add-btn-onb, .toggle-btn-onb > i, .payed-btn-onb, .copy-btn-onb, .del-btn-onb, .users-onb{
+  overflow: visible!important;
+  z-index: 10;
+  transition: all .5s;
+}
+
+html[theme="light"]{
+  .add-btn-onb, .toggle-btn-onb > i, .payed-btn-onb, .copy-btn-onb, .del-btn-onb, .users-onb{
+    box-shadow: 0 0 17px 21px rgba($light_main, 50%)!important;
+  }
+}
+html[theme="dark"]{
+  .add-btn-onb, .toggle-btn-onb > i, .payed-btn-onb, .copy-btn-onb, .del-btn-onb, .users-onb{
+    box-shadow: 0 0 17px 21px rgba($dark_main, 50%)!important;
+  }
+}
+
+.toggle-btn-onb{
+  i{
+    border-radius: 20px;
+  }
 }
 
 </style>

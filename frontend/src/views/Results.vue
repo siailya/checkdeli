@@ -28,16 +28,16 @@
     <div class="cd-card results-header mt-3 text-center">
       <div class="content">
         Результаты
-        <div class="results-subheader">
+        <div class="results-subheader" v-if="!fromURL">
           Ну наконец-то!
         </div>
-        <div class="check-info mt-1" v-if="checkTitle && CDUser.name">
+        <div class="check-info mt-1" v-else>
           Чек "{{checkTitle}}", который создал {{CDUser.name}} {{new Date(checkDate).toLocaleDateString("ru")}}
         </div>
       </div>
     </div>
     <div class="cd-card results-wrapper mb-3">
-      <div class="mode-buttons d-flex justify-content-around">
+      <div class="mode-buttons d-flex justify-content-around" :class="onboarding === 0 ? 'mode-btn-onb' : ''">
         <div class="slider" id="slider"></div>
         <div class="who-whom w-100">
           <button class="who-whom-btn w-100" id="who_whom_btn" style="color: var(--main)" @click="toggleMode(0)">Кто - кому</button>
@@ -53,8 +53,8 @@
             <br>
             Никого нет!
           </div>
-          <div class="who-cell-wrapper" v-for="user in users" :key="user.id" @click="showUserMore(user)">
-            <div class="cd-card who-cell mt-3 w-100 text-center" v-if="users.length > 1 && Object.keys(who_whom[user.id]).map((key) => {return [key, who_whom[user.id][key]]}).filter((item) => {return item[1] !== 0 && parseInt(item[0]) !== user.id}).length > 0">
+          <div class="who-cell-wrapper" v-for="user in users" :key="user.id" @click="() => {showUserMore(user); onboardingNext()}">
+            <div class="cd-card who-cell mt-3 w-100 text-center" :class="onboarding === 1 ? 'user-card-onb' : ''" v-if="users.length > 1 && Object.keys(who_whom[user.id]).map((key) => {return [key, who_whom[user.id][key]]}).filter((item) => {return item[1] !== 0 && parseInt(item[0]) !== user.id}).length > 0">
               <span class="user">Пользователь {{userById(user.id).name}} должен</span>
               <div class="who-whom-cell-wrapper" v-for="(amount, who, index) in who_whom[user.id]" :key="index">
                 <div class="who-whom-cell text-left" v-if="(parseInt(who) !== user.id) && (amount > 0)">
@@ -123,6 +123,17 @@
         </button>
       </router-link>
     </div>
+
+    <transition name="slide-up" appear>
+      <div class="adaptive-width onboarding cd-card text-center" v-if="onboarding < 2">
+        <div class="onb-header">
+          Обучалочка
+        </div>
+        {{onboarding_text[onboarding] || ""}}
+        <br>
+        <button class="onb-next-btn mt-2" @click="onboardingNext()">Дальше</button>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -140,6 +151,11 @@ export default {
       mode: 0,
       activeUser: {products: []},
       fromURL: false,
+      onboarding: 1000,
+      onboarding_text: [
+          "Это панель результатов. У нее есть 2 режима: пользователи, которЫЕ должны и пользователи которЫМ кто-то должен",
+          "В первом режиме можно нажать на любую карточку пользователя и посмотреть его 'Виртуальный счёт' - то, за что он должен"
+      ]
     }
   },
   computed: {
@@ -154,6 +170,16 @@ export default {
   },
   methods: {
     ...mapActions(["setCDID", "calculateResults", "createNewCheck", "updateCheck"]),
+    onboardingNext() {
+      if (this.onboarding === 1) {
+        localStorage.setItem("res-onb", "true")
+      }
+      let old = this.onboarding
+      this.onboarding = 1000
+      setTimeout(() => {
+        this.onboarding = old + 1
+      }, 600)
+    },
     toggleMode(mode) {
       function activate(id) {
         let btn = document.getElementById(id)
@@ -187,12 +213,15 @@ export default {
     },
   },
   mounted() {
+    if (localStorage.getItem("res-onb") !== "true") {
+      this.onboarding = 0
+    }
+
     if (this.$route.params.storestring) {
       this.fromURL = true
       this.$store.commit("updateCDID", this.$route.params.storestring)
 
       axios.get(BACKEND + APIv1 + "/checks/getbyid/" + this.$route.params.storestring).then(r => {
-
         this.$store.state.users.users = r.data.users
         this.$store.state.products.products = r.data.products
         this.$store.state.products.defaultPayed = r.data.defaultPayed
@@ -208,7 +237,7 @@ export default {
     if ((this.CDUser.name !== undefined) && (this.$route.params.storestring === undefined)) {
       if (this.cdid === null && this.checkTitle !== "") {
         this.createNewCheck()
-      } else {
+      } else if (this.checkTitle !== "") {
         this.updateCheck()
       }
     }
@@ -440,6 +469,23 @@ html[theme="glass"] .share{
   padding: 8px 6px;
   font-size: 16.5px;
   font-weight: 500;
+}
+
+.mode-btn-onb, .user-card-onb{
+  overflow: visible!important;
+  z-index: 10;
+  transition: all .5s;
+}
+
+html[theme="light"]{
+  .mode-btn-onb, .user-card-onb{
+    box-shadow: 0 0 17px 21px rgba($light_main, 50%)!important;
+  }
+}
+html[theme="dark"]{
+  .mode-btn-onb, .user-card-onb{
+    box-shadow: 0 0 17px 21px rgba($dark_main, 50%)!important;
+  }
 }
 </style>
 

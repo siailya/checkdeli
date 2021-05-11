@@ -78,7 +78,7 @@
       <span class="cd-user-hello color-text">Привет, {{ CDUser.name || "Никто" }}!</span>
       <cd-avatar :user="CDUser" class="ml-auto mr-auto mt-2 mb-2"/>
       <span v-if="checks.length > 0">
-        Разделен {{checks.length > 1 ? 'о' : ''}} уже {{ checks.length }} {{checksCountWord}}!
+        Разделен{{checks.length > 1 ? 'о' : ''}} уже {{ checks.length }} {{checksCountWord}}!
       </span>
       <span v-else>
         Время разделить первый чек!
@@ -129,7 +129,7 @@
           </div>
         </div>
         <button v-if="CDUser.name && !checksLoading"
-                v-b-modal.create_check_modal
+                @click="createCheck()"
                 class="active-btn add-check-btn d-flex w-100 justify-content-center mt-2 color-text shadowed">
           <i class="material-icons color-text mt-auto mb-auto mr-1">add_circle_outline</i> Новый чек
         </button>
@@ -194,7 +194,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchChecks", "setCDID", "clearCDUser"]),
+    ...mapActions(["fetchChecks", "setCDID", "clearCDUser", "resetUsers", "resetProducts"]),
+    createCheck() {
+      this.checkTitle = ""
+      this.checkDate = null
+      this.currentStep = 0
+      this.$bvModal.show("create_check_modal")
+    },
     nextStep() {
       const showWrong = () => {
         let btn = document.getElementById("next_step_btn")
@@ -211,6 +217,8 @@ export default {
         }
       } else if (this.currentStep === 2) {
         if (this.checkDate) {
+          this.resetUsers()
+          this.resetProducts()
           this.currentStep++
           this.$router.push("/addusers")
         } else {
@@ -239,6 +247,10 @@ export default {
   mounted() {
     if (this.CDUser._id){
       this.fetchChecks()
+    } else {
+      this.$router.push("/")
+      console.log(this.$parent.$children)
+      this.$bvModal.show("login_modal")
     }
   }
 }

@@ -4,37 +4,45 @@
       <div class="login-content">
         <div class="login-header text-center">
         Познакомимся?
-      </div>
-        <div class="login-with text-center">
-          Войти через
         </div>
-        <a href="https://oauth.vk.com/authorize?client_id=7803894&display=popup&redirect_uri=http://localhost:3000/vk&scope=friends&response_type=code&v=5.130">
-          <div class="login-with-list d-flex justify-content-center">
-            <img width="42" height="42" src="@/assets/logo_vk_color_28.svg" alt="VK">
-          </div>
-        </a>
+        <div class="login-with text-center">
+          Быстрый вход через
+        </div>
+        <div class="d-flex login-with-box justify-content-center mt-2">
+          <a href="https://oauth.vk.com/authorize?client_id=7803894&display=popup&redirect_uri=https://checkdeli.online/vk&scope=friends&response_type=code&v=5.130">
+            <div class="login-with-list d-flex justify-content-center">
+              <img width="35" height="35" src="@/assets/logo_vk_color_28.svg" alt="VK">
+            </div>
+          </a>
+          <a class="mr-2 ml-2" href="https://oauth.yandex.ru/authorize?response_type=token&client_id=a3e43d83e5cd49e391b7b3f01fc526b0">
+            <div class="login-with-list d-flex justify-content-center">
+              <img width="35" height="35" src="@/assets/ya_logo.png" alt="Yandex">
+            </div>
+          </a>
+          <a href="https://accounts.google.com/o/oauth2/auth?client_id=755018470764-mqm8s4o88prusrn10l0a5g7kglje1led.apps.googleusercontent.com&redirect_uri=https://checkdeli.online/gl&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile">
+            <div class="login-with-list d-flex justify-content-center">
+              <img width="35" height="35" src="@/assets/google_logo.png" alt="Google">
+            </div>
+          </a>
+        </div>
         <div class="or-login text-center mt-1 mb-1">
           - или -
         </div>
         <div class="login-password">
-          <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email" @input="checkAccount">
-          <input type="password" class="form-control" placeholder="Пароль" v-model="password">
-          <div class="cd-card password-hints" v-if="password && !accountInBase">
-            Минимум 6 знаков - <i class="material-icons-round" :style="this.passwordVerify[0] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[0] ? 'done' : 'close'}}</i><br>
-            Хотя бы одна заглавная буква - <i class="material-icons-round" :style="this.passwordVerify[1] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[1] ? 'done' : 'close'}}</i><br>
-            Хотя бы одна цифра - <i class="material-icons-round" :style="this.passwordVerify[2] ? 'color: green' : 'color: var(--wrong)'">{{this.passwordVerify[2] ? 'done' : 'close'}}</i>
-          </div>
-          <transition name="slide-up">
-            <div class="account-info" v-if="emailVerify && email.includes('@')">
-              <div class="login text-center mt-2" v-if="emailVerify && accountInBase">
-                <button @click="loginNative" class="login-btn mt-1 w-100" :class="wrongPassword ? 'wrong-login' : ''">{{wrongPassword ? "Неверный пароль!" : "Войти"}}</button>
+          <b-form @submit="loginNative">
+            <input type="email" class="form-control mb-1" placeholder="Электропочта" v-model="email">
+            <input type="password" class="form-control" placeholder="Пароль" v-model="password">
+            <div class="account-info">
+              <div class="login text-center mt-2">
+              <button type="submit" class="login-btn mt-1 w-100" :class="wrongPassword ? 'wrong-login' : ''">{{wrongPassword ? "Неверный пароль!" : "Войти"}}</button>
               </div>
-              <div class="register text-center" v-if="emailVerify && !accountInBase">
-                <input type="text" class="form-control mt-1 mb-2" placeholder="Имя" v-model="name">
-                <button @click="registerNative" class="register-btn mt-1 w-100" :class="registerError ? 'wrong-login' : ''">{{registerError ? "Заполни все поля!" : "Создать аккаунт"}}</button>
+              <div class="register text-center mt-2">
+                <router-link to="/register">Создать новый аккаунт</router-link>
               </div>
             </div>
-          </transition>
+          </b-form>
+<!--          <transition name="slide-up">-->
+<!--          </transition>-->
         </div>
         <div class="or-login text-center mt-1 mb-1">
           - или -
@@ -114,12 +122,12 @@
             </div>
           </div>
           <div class="image">
-            <img src="../assets/story/gena1.png" alt="">
+            <img src="../assets/story/gena1.webp" alt="">
           </div>
         </div>
         <div class="story-chapter middle d-flex">
           <div class="image">
-            <img src="../assets/story/gena2.png" alt="">
+            <img src="../assets/story/gena2.webp" alt="">
           </div>
           <div class="text">
             <div class="story-header">
@@ -140,7 +148,7 @@
             </div>
           </div>
           <div class="image">
-            <img src="../assets/story/gena3.png" alt="">
+            <img src="../assets/story/gena3.webp" alt="">
           </div>
         </div>
       </div>
@@ -218,17 +226,17 @@
         <h1 class="for-what-header text-center color-text">Зачем нужен Чекдели?</h1>
         <h2 class="for-what-subheader text-center">Действительно. Зачем? И для кого?</h2>
         <div v-tilt="{max: 5, glare: true}" class="fw already cd-card">
-          <img src="../assets/stopwatch.png" alt="">
+          <img src="../assets/stopwatch.webp" alt="">
           <h3>Для тех, кто хочет сейчас</h3>
           <div>Нужен только телефон и чуть-чуть интернета!</div>
         </div>
         <div v-tilt="{max: 5, glare: true}" class="fw big cd-card">
-          <img src="../assets/people.png" alt="">
+          <img src="../assets/people.webp" alt="">
           <h3>Для больших компаний</h3>
           <div>Трудно вспомнить, кто что ел? Не беда!</div>
         </div>
         <div v-tilt="{max: 5, glare: true}" class="fw calc cd-card">
-          <img src="../assets/calc.png" alt="">
+          <img src="../assets/calc.webp" alt="">
           <h3>Для тех, кто устал считать</h3>
           <div>Никаких калькуляторов и Excel!</div>
         </div>
@@ -255,7 +263,7 @@
       </div>
       <div class="cd-info">
         <a href="https://vk.com/overcreated" class="madeby align-items-center">Сделано {{["overcreated", "siailya"][Math.floor(Math.random() * 2)]}} c <i class="material-icons" style="color: var(--wrong); font-size: 15px">favorite</i></a>
-        <div class="ver">v1.2.0a</div>
+        <div class="ver">v1.3.0b</div>
       </div>
     </footer>
   </div>
@@ -266,7 +274,6 @@ import {mapActions} from "vuex";
 import {mapGetters} from "vuex";
 import axios from "axios";
 import {APIv1, BACKEND} from "../../backend.config";
-import debounce from "debounce";
 import jwt from "jsonwebtoken";
 
 export default {
@@ -295,20 +302,6 @@ export default {
     mainColor() {
       return window.getComputedStyle(document.documentElement).getPropertyValue('--main').replace("#", "").replace(" ", "")
     },
-    emailVerify: function () {
-      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(String(this.email).toLowerCase())
-    },
-    passwordVerify: function () {
-      let len = false
-      let upperCase = false
-      let digits = false
-      if (this.password.length > 6) len = true
-      if (/[A-ZА-Я]+/.test(this.password)) upperCase = true
-      if (/\d+/.test(this.password)) digits = true
-
-      return [len, upperCase, digits]
-    }
   },
   beforeRouteLeave(to, from, next) {
     window.removeEventListener("scroll", this.listenScroll)
@@ -326,19 +319,6 @@ export default {
       }
       this.theme += 1
     },
-    checkAccount: debounce(function () {
-      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-      if (re.test(String(this.email).toLowerCase())) {
-        axios.post(BACKEND + APIv1 + "/checkaccount", {email: this.email}).then(r => {
-          if (r.data === 0) {
-            this.accountInBase = false
-          } else {
-            this.accountInBase = true
-          }
-        })
-      }
-    }, 1000, true),
     start() {
       if (this.CDUser._id) {
         this.$router.push("/home")
@@ -350,7 +330,8 @@ export default {
       let back = document.getElementById("back-wave")
       back.style.transform = `translateY(${window.pageYOffset / 15}px)`
     },
-    loginNative () {
+    loginNative (e) {
+      e.preventDefault()
       axios.post(BACKEND + APIv1 + "/login/native", {type: "native", name: this.name, email: this.email, password: this.password}).then(r => {
         console.log(r.data)
         console.log(jwt.decode(r.data.token))
@@ -365,19 +346,6 @@ export default {
           }, 5000)
         }
       })
-    },
-    registerNative () {
-      if (this.email && this.password && this.name && this.passwordVerify.every(e => e === true)) {
-        axios.post(BACKEND + APIv1 + "/register/native", {type: "native", name: this.name, email: this.email, password: this.password}).then(r => {
-          this.$store.commit("updateCDUser", jwt.decode(r.data.token).user)
-          this.$router.push("/home")
-        })
-      } else {
-        this.registerError = true
-        setTimeout(() => {
-          this.registerError = false
-        }, 5000)
-      }
     }
   },
   mounted() {
@@ -698,7 +666,7 @@ html[theme="dark"]{
 }
 
 .login-header{
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--main);
 }
@@ -712,7 +680,8 @@ html[theme="dark"]{
 }
 
 .without-login{
-  color: var(--main);
+  color: var(--text-secondary);
+  font-size: 14px;
   outline: none;
   text-decoration: underline;
 }
@@ -731,13 +700,6 @@ html[theme="dark"]{
   color: white;
 }
 
-.password-hints{
-  font-size: 12px;
-  i{
-    font-size: 15px;
-  }
-}
-
 .login-btn, .register-btn{
   background: var(--main);
   color: white;
@@ -750,11 +712,10 @@ html[theme="dark"]{
   transition: all .3s;
 }
 
-.wrong-login{
-  background: var(--wrong);
-}
-
-.wrong-login:active{
-  animation: wrong .5s infinite;
+.register{
+  a{
+    color: var(--main);
+    text-decoration: underline;
+  }
 }
 </style>

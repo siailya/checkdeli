@@ -71,7 +71,7 @@ export default {
     }
   },
   mounted() {
-    if (document.cookie.includes("auth=vk") || document.cookie.includes("auth=native")) {
+    if (document.cookie.includes("auth=vk") || document.cookie.includes("auth=native") || document.cookie.includes("auth=ya") || document.cookie.includes("auth=gl")) {
       this.restoreAuth()
     }
   }
@@ -351,6 +351,53 @@ html[theme="dark"] .active-btn:active{
   }
 }
 
+.snackbar, .onboarding {
+  position: fixed;
+  margin-left: 0!important;
+  bottom: 2vh;
+  border-radius: 15px;
+  color: white;
+}
+
+@media screen and (max-width: 768px){
+  .snackbar, .onboarding {
+    width: 90%!important;
+    margin-left: 5%!important;
+  }
+}
+
+.onb-header{
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.onb-next-btn{
+  border-radius: 50px;
+  padding: 6px 18px;
+  background: var(--background-secondary);
+  color: var(--text-color);
+  border: none;
+  outline: none;
+}
+
+html[theme="glass"]{
+  .snackbar{
+    background: rgba($main, 0.75)!important;
+  }
+}
+
+html[theme="light"]{
+  .snackbar, .onboarding{
+    background: rgba($light_main, 0.75)!important;
+  }
+}
+
+html[theme="dark"]{
+  .snackbar, .onboarding{
+    background: rgba($dark_main, 0.75)!important;
+  }
+}
+
 html[theme="glass"] .cd-card.modal-content {
   background: rgba(230, 230, 230, 0.6) !important;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
@@ -408,6 +455,14 @@ html[theme="light"] .cd-card.modal-content {
     border-radius: 50px;
     transition: all .3s;
   }
+}
+
+.wrong-login{
+  background: var(--wrong)!important;
+}
+
+.wrong-login:active{
+  animation: wrong .5s infinite;
 }
 
 .bounce-enter-active {

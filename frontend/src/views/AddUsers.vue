@@ -110,13 +110,13 @@ export default {
   methods: {
     ...mapActions(["addUser", "deleteUser", "setDefaultPayed"]),
     animateList() {
-      if (this.users.length > 1) {
+      if (this.users.length >= 1) {
         let new_height = this.users.length * 74 + 10
         let el = document.getElementsByClassName("users-wrapper")[0]
         el.style.height = new_height + "px"
       } else {
         let el = document.getElementsByClassName("users-wrapper")[0]
-        el.style.height = 90 + "px"
+        el.style.height = 155 + "px"
       }
 
     },
@@ -266,6 +266,7 @@ html[theme="light"] {
 .main-content{
   transition: all .3s;
 }
+
 
 .handle{
   color: white;

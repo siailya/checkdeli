@@ -63,6 +63,9 @@ export default {
         },
         async updateCheck(){
             await axios.post(BACKEND + APIv1 + "/checks/update", {cd: this.state.products, users: this.state.users.users})
+        },
+        resetProducts(ctx) {
+            ctx.commit("updateProducts", [])
         }
     },
     mutations: {

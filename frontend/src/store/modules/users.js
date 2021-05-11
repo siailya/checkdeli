@@ -10,6 +10,9 @@ export default {
             let users = JSON.parse(JSON.stringify(this.state.users))
             users.splice(index, 1)
             ctx.commit("userDeleted", users)
+        },
+        resetUsers(ctx) {
+            ctx.commit("updateUsers", [ctx.getters.CDUser])
         }
     },
     mutations: {
