@@ -4,6 +4,8 @@ import {API} from 'vk-io';
 
 require("babel-core/register");
 require("babel-polyfill");
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
 const APIv1 = "/api/v1"
 const port = 3000;
@@ -12,7 +14,7 @@ const secret = "CheckDeliSecretKeyJ9Ntt!J6V(FJbTc"
 const express = require("express")
 const mongoose = require("mongoose");
 const history = require('connect-history-api-fallback')
-const staticFileMiddleware = express.static("../frontend/dist")
+const staticFileMiddleware = express.static(__dirname.slice(0, -12) + "/frontend/dist")
 
 const api = new API({
     token: "025cfd38025cfd38025cfd389d022beece0025c025cfd386201011549fd98d272cda721"
@@ -74,8 +76,10 @@ app.post(APIv1 + "/checkaccount", async (req, res) => {
     }
 })
 
-app.post(APIv1 + "/register/native", (req, res) => {
-    CDUser.create(req.body).then(r => {
+app.post(APIv1 + "/register/native", async (req, res) => {
+    let user = await CDUser.findOne({email: req.body.email})
+    if (!user) {
+        CDUser.create(req.body).then(r => {
         r.setPassword(req.body.password)
         r.save()
 
@@ -93,34 +97,42 @@ app.post(APIv1 + "/register/native", (req, res) => {
                 sameSite: "strict"
             }).send({status: "User created!", token})
     })
+    } else {
+        res.status(403).send("Registration failed!")
+    }
+
 })
 
 app.post(APIv1 + "/login/native", (req, res) => {
-    CDUser.findOne({email: req.body.email}).then(r => {
-        if (r.validPassword(req.body.password)) {
+    try {
+        CDUser.findOne({email: req.body.email}).then(r => {
+            if (r && r.validPassword(req.body.password)) {
 
-            let user = JSON.parse(JSON.stringify(r))
-            delete user.salt
-            delete user.hash
+                let user = JSON.parse(JSON.stringify(r))
+                delete user.salt
+                delete user.hash
 
-            let token = jwt.sign({user: user}, secret, {expiresIn: "3h"})
-            res.cookie("auth", "native",
-                {maxAge: 60 * 60 * 60 * 24 * 7})
-                .cookie("jwt", token,
-                {
-                maxAge: 60 * 60 * 60 * 24 * 7,
-                httpOnly: true,
-                sameSite: "strict"
-            }).send({status: "User login successful!", token})
-        } else {
-            res.send("User login failed!")
-        }
-    })
+                let token = jwt.sign({user: user}, secret, {expiresIn: "3h"})
+                res.cookie("auth", "native",
+                    {maxAge: 60 * 60 * 60 * 24 * 7})
+                    .cookie("jwt", token,
+                    {
+                    maxAge: 60 * 60 * 60 * 24 * 7,
+                    httpOnly: true,
+                    sameSite: "strict"
+                }).send({status: "User login successful!", token})
+            } else {
+                res.send("User login failed!")
+            }
+        })
+    } catch (e) {
+        res.send("User login failed!")
+    }
 })
 
 app.post(APIv1 + "/login/vk", (async (req, res) => {
     try {
-        let vkdata = (await axios.get(`https://oauth.vk.com/access_token?client_id=7803894&client_secret=6ZJhfvtISJCdMOzwerTX&redirect_uri=http://localhost:3000/vk&code=${req.body.code}`)).data
+        let vkdata = (await axios.get(`https://oauth.vk.com/access_token?client_id=7803894&client_secret=6ZJhfvtISJCdMOzwerTX&redirect_uri=https://checkdeli.online/vk&code=${req.body.code}`)).data
         let vkid = vkdata.user_id
         let user = await CDUser.findOne({vkid: vkid}, {__v: 0, checks: 0})
 
@@ -155,6 +167,87 @@ app.post(APIv1 + "/login/vk", (async (req, res) => {
         res.status(500).send({status: "Failed to login", error: e.message})
     }
 }))
+
+app.post(APIv1 + "/login/ya", async (req, res) => {
+    try {
+        let yadata = (await axios.get('https://login.yandex.ru/info?' + "format=json&oauth_token=" + req.body.token)).data
+        let user = await CDUser.findOne({yaid: yadata.id})
+
+        if (user) {
+            let token = jwt.sign({user: user}, secret, {expiresIn: "3d"});
+            res.cookie("auth", "ya",
+                {maxAge: 60 * 60 * 60 * 24 * 7})
+                .cookie("jwt", token,
+                    {
+                        maxAge: 60 * 60 * 60 * 24 * 7,
+                        httpOnly: true,
+                        sameSite: "strict"
+                    }).send({status: "Successful login", token})
+        } else {
+            let uobj = {
+                type: "ya",
+                yaid: yadata.id,
+                name: yadata.first_name,
+                surname: yadata.last_name,
+                email: yadata.default_email,
+                avatar: "https://avatars.mds.yandex.net/get-yapic/" + (yadata.default_avatar_id || "") + "/islands-200"
+            }
+
+            CDUser.create(uobj).then(async r => {
+                let token = jwt.sign({user: r}, secret, {expiresIn: "3d"});
+                res.cookie("auth", "ya", {maxAge: 60 * 60 * 60 * 24 * 7}).cookie("jwt", token, {
+                    maxAge: 60 * 60 * 60 * 24 * 7,
+                    httpOnly: true,
+                    sameSite: "strict"
+                }).send({status: "Successful register", token})
+            })
+        }
+    } catch (e) {
+        res.status(500).send({status: "Failed to login", error: e.message})
+    }
+})
+
+app.post(APIv1 + "/login/gl", async (req, res) => {
+    try {
+        let token_data = (await axios.post("https://accounts.google.com/o/oauth2/token",
+            {
+                client_id: "755018470764-mqm8s4o88prusrn10l0a5g7kglje1led.apps.googleusercontent.com",
+                client_secret: "4y2mkrcTURlie8sSRlELea2v",
+                redirect_uri: "https://checkdeli.online/gl",
+                grant_type: "authorization_code",
+                code: req.body.code
+            })).data
+        let gldata = (await axios.get("https://www.googleapis.com/oauth2/v1/userinfo?" + `access_token=${token_data.access_token}&` + `id_token=${token_data.id_token}&` + "token_type=Bearer&expires_in=3599")).data
+        let user = await CDUser.findOne({glid: parseInt(gldata.id)})
+
+        if (user) {
+            let token = jwt.sign({user: user}, secret, {expiresIn: "3d"});
+            res.cookie("auth", "gl",
+                {maxAge: 60 * 60 * 60 * 24 * 7})
+                .cookie("jwt", token,
+                    {
+                        maxAge: 60 * 60 * 60 * 24 * 7,
+                        httpOnly: true,
+                        sameSite: "strict"
+                    }).send({status: "Successful login", token})
+        } else {
+            gldata.type = "gl"
+            gldata.glid = parseInt(gldata.id)
+            gldata.avatar = gldata.picture
+
+            CDUser.create(gldata).then(async r => {
+                let token = jwt.sign({user: r}, secret, {expiresIn: "3d"});
+                res.cookie("auth", "gl", {maxAge: 60 * 60 * 60 * 24 * 7}).cookie("jwt", token, {
+                    maxAge: 60 * 60 * 60 * 24 * 7,
+                    httpOnly: true,
+                    sameSite: "strict"
+                }).send({status: "Successful register", token})
+            })
+        }
+    } catch (e) {
+        res.status(500).send({status: "Failed to login", error: e.message})
+    }
+})
 
 app.get(APIv1 + "/relogin", ((req, res) => {
     let v_token = req.cookies.jwt

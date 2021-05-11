@@ -7,6 +7,8 @@ export const CDUserSchema = new Schema({
     surname: String,
     type: {type: String},
     vkid: Number,
+    yaid: Number,
+    glid: Number,
     email: {type: String},
     salt: String,
     hash: String,
